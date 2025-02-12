@@ -1,0 +1,64 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Identity
+@using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login;
+@rendermode RenderMode.InteractiveServer
+@inject NavigationManager Navigation
+@inject LoginService _loginService
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color: red">@errorMessage</p>
+}
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
+        <div class="card-body">
+            <h4 class="mb-1 pt-2">Welcome 👋</h4>
+            <p class="mb-4">Please sign-in to your account and start the adventure</p>
+            <div class="form-floating mb-3">
+                    <div class="mb-3">
+                        <label class="form-label">UserName</label>
+                        <input class="form-control" type="text"
+                               placeholder="UserName" @bind-value="_requestModel.UserName" maxlength="11" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input class="form-control" type="text"
+                               placeholder="Password" @bind-value="_requestModel.Password" maxlength="11" />
+                    </div>
+                <button type="button" class="btn btn-primary w-100 py-2" @onclick=Login>SignIn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginRequestModel _requestModel= new LoginRequestModel();
+    private async Task Login()
+    {
+        // Debugging - Check if values are present
+        Console.WriteLine($"Username: {_requestModel.UserName}, Password: {_requestModel.Password}");
+
+        if (string.IsNullOrWhiteSpace(_requestModel.UserName) || string.IsNullOrWhiteSpace(_requestModel.Password))
+        {
+            errorMessage = "Username and Password are required.";
+            return;
+        }
+        try
+        {
+            var result = await _loginService.Login(_requestModel);
+            if (result.UserCode == null) // Ensure result is handled properly
+            {
+                errorMessage = "Invalid login attempt.";
+                return;
+            }
+
+            Navigation.NavigateTo("/");
+        } 
+        catch (Exception ex)
+        {
+            errorMessage = "An error occurred while logging in.";
+        }
+    }
+    private string errorMessage = string.Empty;
+
+}

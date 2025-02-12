@@ -6,4 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PersonalFinanceTrackingSystem.Database\PersonalFinanceTrackingSystem.Database.csproj" />
+    <ProjectReference Include="..\PersonalFinanceTrackingSystem.Domain\PersonalFinanceTrackingSystem.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,10 +1,28 @@
 using PersonalFinanceTrackingSystem.App.Components;
+using System;
+using Microsoft.EntityFrameworkCore;
+using PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
+using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+#region DbService
+
+var connectionString = builder.Configuration.GetConnectionString("DbConnection");
+builder.Services.AddDbContext<AppDbContext>(opt =>
+{
+    opt.UseSqlServer(connectionString);
+},
+ServiceLifetime.Transient,
+ServiceLifetime.Transient);
+
+#endregion
+
+builder.Services.AddScoped<LoginService>();
 
 var app = builder.Build();
 

@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalFinanceTrackingSystem.App", "PersonalFinanceTrackingSystem.App\PersonalFinanceTrackingSystem.App.csproj", "{BD855537-8FD7-4C3F-A066-73D5401656AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceTrackingSystem.App", "PersonalFinanceTrackingSystem.App\PersonalFinanceTrackingSystem.App.csproj", "{BD855537-8FD7-4C3F-A066-73D5401656AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalFinanceTrackingSystem.Database", "PersonalFinanceTrackingSystem.Database\PersonalFinanceTrackingSystem.Database.csproj", "{68E72DEC-05A3-4062-95D1-196616B452AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceTrackingSystem.Database", "PersonalFinanceTrackingSystem.Database\PersonalFinanceTrackingSystem.Database.csproj", "{68E72DEC-05A3-4062-95D1-196616B452AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalFinanceTrackingSystem.Shared", "PersonalFinanceTrackingSystem.Shared\PersonalFinanceTrackingSystem.Shared.csproj", "{E38165FC-AFF2-4ABB-9F05-537B803288AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceTrackingSystem.Shared", "PersonalFinanceTrackingSystem.Shared\PersonalFinanceTrackingSystem.Shared.csproj", "{E38165FC-AFF2-4ABB-9F05-537B803288AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonalFinanceTrackingSystem.Domain", "PersonalFinanceTrackingSystem.Domain\PersonalFinanceTrackingSystem.Domain.csproj", "{8ACAD11B-407C-4330-8FB6-51D1F7B791F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PersonalFinanceTrackingSystem.Domain", "PersonalFinanceTrackingSystem.Domain\PersonalFinanceTrackingSystem.Domain.csproj", "{8ACAD11B-407C-4330-8FB6-51D1F7B791F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
