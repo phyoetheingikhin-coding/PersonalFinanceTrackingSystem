@@ -21,10 +21,10 @@ public class LoginService
             x.Password == requestModel.Password
 
             );
-        if (user is not null)
-        {
-            model.UserCode = user.UserCode;
-        }
+        // if (user is not null)
+        // {
+        //     model.UserCode = user.UserCode;
+        // }
         return model;
     }
 }

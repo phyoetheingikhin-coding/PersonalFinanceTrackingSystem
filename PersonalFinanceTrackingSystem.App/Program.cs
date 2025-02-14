@@ -3,6 +3,8 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
 using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login;
+using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Register;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,8 @@ ServiceLifetime.Transient);
 #endregion
 
 builder.Services.AddScoped<LoginService>();
+builder.Services.AddScoped<RegisterService>();
+
 
 var app = builder.Build();
 

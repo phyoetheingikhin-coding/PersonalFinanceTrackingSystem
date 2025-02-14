@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PersonalFinanceTrackingSystem.Database\PersonalFinanceTrackingSystem.Database.csproj" />
+    <ProjectReference Include="..\PersonalFinanceTrackingSystem.Shared\PersonalFinanceTrackingSystem.Shared.csproj" />
   </ItemGroup>
 
 </Project>

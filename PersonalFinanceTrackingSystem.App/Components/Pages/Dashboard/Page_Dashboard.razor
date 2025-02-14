@@ -1,5 +1,49 @@
-<h3>Page_Dashboard</h3>
+@page "/dashboard"
+@inject NavigationManager Navigation
+@using PersonalFinanceTrackingSystem.App.Components.Layout
+@layout MainLayout
+@inject IJSRuntime JsRuntime
+<div class="card p-3">
+    <div class="card-body">
+        <div class="row p-3">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <figure>
+                            <div id="chart"></div>
+                        </figure>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="topProductBarChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="app">
+                            <div id=""></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@code{
 
-@code {
-    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync("setPieChart");
+        }
+    }
+
 }

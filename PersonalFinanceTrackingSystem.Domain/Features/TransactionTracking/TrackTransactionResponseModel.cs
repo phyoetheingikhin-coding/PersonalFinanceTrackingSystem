@@ -1,6 +1,6 @@
 namespace PersonalFinanceTrackingSystem.Domain.Features.TransactionTracking;
 
-public class TransactionTrackingResponseModel
+public class TrackTransactionResponseModel
 {
     public string UserName { get; set; }
     public string CategoriesName { get; set; }

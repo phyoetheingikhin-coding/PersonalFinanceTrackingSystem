@@ -19,29 +19,29 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Tbl_Category> Tbl_Categories { get; set; }
 
+    public virtual DbSet<Tbl_ExpenseCategory> Tbl_ExpenseCategories { get; set; }
+
     public virtual DbSet<Tbl_Transaction> Tbl_Transactions { get; set; }
 
     public virtual DbSet<Tbl_User> Tbl_Users { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=PersonalFinanceTracking;User Id=sa;Password=sasa@123;TrustServerCertificate=true;");
-
+   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Tbl_Budget>(entity =>
         {
+            entity.HasKey(e => e.BudgetsId);
+
             entity.Property(e => e.CategoriesCode)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.LimitAmount).HasColumnType("decimal(18, 0)");
-            entity.Property(e => e.Month)
+            entity.Property(e => e.PeriodType)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
             entity.Property(e => e.UserCode)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Year)
                 .HasMaxLength(50)
                 .IsUnicode(false);
         });
@@ -62,17 +62,30 @@ public partial class AppDbContext : DbContext
                 .IsUnicode(false);
         });
 
+        modelBuilder.Entity<Tbl_ExpenseCategory>(entity =>
+        {
+            entity.HasNoKey();
+
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.ExpenseCatName)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
         modelBuilder.Entity<Tbl_Transaction>(entity =>
         {
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 0)");
             entity.Property(e => e.CategoriesCode)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.Date).HasColumnType("datetime");
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Descriptions)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.UserCode)
+            entity.Property(e => e.TransactionType)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.UserId)
                 .HasMaxLength(50)
                 .IsUnicode(false);
         });
@@ -86,14 +99,14 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(30)
                 .IsUnicode(false);
             entity.Property(e => e.Password)
-                .HasMaxLength(6)
+                .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.Phone)
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
-            entity.Property(e => e.UserCode)
-                .HasMaxLength(20)
+            entity.Property(e => e.UserId)
+                .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.UserName)
                 .HasMaxLength(50)

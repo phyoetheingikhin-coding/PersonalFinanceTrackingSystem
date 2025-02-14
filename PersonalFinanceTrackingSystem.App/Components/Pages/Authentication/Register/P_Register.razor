@@ -1,5 +1,33 @@
-<h3>P_Register</h3>
+@page "/"
+@using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Register
+@inject NavigationManager Navigation
+@inject RegisterService _registerService
+@rendermode RenderMode.InteractiveServer
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
+        <div class="card-body">
+            <h4 class="mb-1 pt-2">Register</h4>
+            <p class="mb-4">Please create an account to start your journey</p>
+            <div class="form-floating mb-3">
+                <div class="mb-3">
+                    <label class="form-label">UserName</label>
+                    <input class="form-control" type="text"
+                           placeholder="UserName" @bind="_requestModel.Name"  />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input class="form-control" type="password"
+                           placeholder="Password" @bind="_requestModel.Password" maxlength="6" />
+                </div>
 
-@code {
-    
-}
+                <div class="mb-3">
+                    <label class="form-label">Confirm Password</label>
+                    <input class="form-control" type="password"
+                           placeholder="Confirm Password" @bind="_requestModel.ConfirmPassword" maxlength="6" />
+                </div>
+
+                <button type="button" class="btn btn-primary w-100 py-2" @onclick="Register">Register</button>
+            </div>
+        </div>
+    </div>
+</div>

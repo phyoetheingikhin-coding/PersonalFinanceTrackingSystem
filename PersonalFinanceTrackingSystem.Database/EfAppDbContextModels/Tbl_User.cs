@@ -7,17 +7,19 @@ public partial class Tbl_User
 {
     public int Id { get; set; }
 
-    public string UserCode { get; set; } = null!;
+    public string UserId { get; set; } = null!;
 
-    public string UserName { get; set; } = null!;
+    public string? UserName { get; set; }
 
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; }
 
     public string? Phone { get; set; }
 
-    public string Password { get; set; } = null!;
+    public string? Password { get; set; }
 
-    public DateTime CreatedDate { get; set; }
+    public bool? DelFlag { get; set; }
+
+    public DateTime? CreatedDate { get; set; }
 
     public DateTime? UpdatedDate { get; set; }
 }
