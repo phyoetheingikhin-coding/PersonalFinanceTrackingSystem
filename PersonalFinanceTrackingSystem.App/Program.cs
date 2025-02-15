@@ -5,6 +5,7 @@ using PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
 using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login;
 using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Register;
 using Microsoft.AspNetCore.Components.Authorization;
+using PersonalFinanceTrackingSystem.App.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,9 @@ ServiceLifetime.Transient,
 ServiceLifetime.Transient);
 
 #endregion
+
+builder.Services.AddScoped<IInjectService, InjectService>();
+
 
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<RegisterService>();

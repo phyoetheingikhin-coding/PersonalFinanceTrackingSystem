@@ -3,7 +3,48 @@
 @inject NavigationManager Navigation
 @inject RegisterService _registerService
 @rendermode RenderMode.InteractiveServer
+
 <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card mb-4 col-12 col-md-8 col-lg-6">
+        <div class="card-body">
+            <h4 class="mb-3 text-center pt-2">Register</h4>
+            <p class="mb-4 text-center">Please create an account to start your journey</p>
+            <div class="row">
+                <div class="mb-3 col-12 col-md-6">
+                    <label class="form-label">UserName</label>
+                    <input type="text" class="form-control" @bind="@_requestModel.Name" required />
+                </div>
+                <div class="mb-3 col-12 col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" @bind="@_requestModel.Email" required />
+                </div>
+                <div class="mb-3 col-12 col-md-6">
+                    <label class="form-label">Phone No</label>
+                    <div class="input-group">
+                        <span class="input-group-text">+959</span>
+                        <input type="text" class="form-control" @bind="@_requestModel.PhoneNo" maxlength="9" required />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="mb-3 col-12 col-md-6">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" @bind="@_requestModel.Password" maxlength="6" required />
+                </div>
+                <div class="mb-3 col-12 col-md-6">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" @bind="@_requestModel.ConfirmPassword" maxlength="6" required />
+                </div>
+            </div>
+            <div class="mt-4 text-center">
+                <button type="button" class="btn btn-secondary btn-sm mb-0 me-2">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm mb-0 me-2" @onclick="Register">Register</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* <div class="d-flex justify-content-center align-items-center vh-100">
     <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
         <div class="card-body">
             <h4 class="mb-1 pt-2">Register</h4>
@@ -13,6 +54,16 @@
                     <label class="form-label">UserName</label>
                     <input class="form-control" type="text"
                            placeholder="UserName" @bind="_requestModel.Name"  />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input class="form-control" type="text"
+                           placeholder="Email" @bind="_requestModel.Email" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone No</label>
+                    <input class="form-control" type="text"
+                           placeholder="Phone No" @bind="_requestModel.PhoneNo" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Password</label>
@@ -30,4 +81,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@

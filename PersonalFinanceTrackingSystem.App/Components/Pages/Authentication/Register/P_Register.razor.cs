@@ -1,3 +1,4 @@
+using Microsoft.JSInterop;
 using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Register;
 
 namespace PersonalFinanceTrackingSystem.App.Components.Pages.Authentication.Register;
@@ -34,15 +35,17 @@ public partial class P_Register
         #endregion
 
         _responseModel = await _registerService.Register(_requestModel);
-        if (_responseModel.Response.IsSuccess)
+        if (!_responseModel.Response.IsSuccess)
         {
+            //await JsRuntime.InvokeVoidAsync("showSweetAlert", "success", _responseModel.Response.Message);
+            //await Task.Delay(2000); // Short delay before redirecting
+            //Navigation.NavigateTo("/login"); // Redirect to login
 
-            Navigation.NavigateTo("/login");
+            await _injectService.ErrorMessage(_responseModel.Response.Message);
+            return;
         }
-        else if (!_responseModel.Response.IsSuccess)
-        {
-            _requestModel = new RegisterRequestModel();
-            Navigation.NavigateTo("/");
-        }
+        await _injectService.SuccessMessage(_responseModel.Response.Message);
+        Navigation.NavigateTo("/login");
+        StateHasChanged();
     }
 }
