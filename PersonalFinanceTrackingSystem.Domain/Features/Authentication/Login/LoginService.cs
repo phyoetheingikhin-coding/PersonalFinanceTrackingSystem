@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
+using PersonalFinanceTrackingSystem.Shared;
 
 namespace PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login;
 
@@ -15,10 +16,11 @@ public class LoginService
     public async Task<LoginResponseModel> Login(LoginRequestModel requestModel)
     {
         var model = new LoginResponseModel();
+        string hashPassword = requestModel.Password.ToSHA256HexHashString(requestModel.UserName);
         var user = await _db.Tbl_Users.AsNoTracking()
             .FirstOrDefaultAsync(
             x => x.UserName == requestModel.UserName &&
-            x.Password == requestModel.Password
+            x.Password == hashPassword
 
             );
         // if (user is not null)

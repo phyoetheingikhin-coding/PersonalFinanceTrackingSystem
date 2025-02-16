@@ -25,23 +25,25 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Tbl_User> Tbl_Users { get; set; }
 
-   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Tbl_Budget>(entity =>
         {
-            entity.HasKey(e => e.BudgetsId);
-
+            entity.Property(e => e.BudgetId)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.CategoriesCode)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.Property(e => e.CategoryName)
+                .HasMaxLength(10)
+                .IsFixedLength();
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.FromDate).HasColumnType("datetime");
             entity.Property(e => e.LimitAmount).HasColumnType("decimal(18, 0)");
-            entity.Property(e => e.PeriodType)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+            entity.Property(e => e.ToDate).HasColumnType("datetime");
             entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
-            entity.Property(e => e.UserCode)
+            entity.Property(e => e.UserId)
                 .HasMaxLength(50)
                 .IsUnicode(false);
         });
@@ -99,7 +101,7 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(30)
                 .IsUnicode(false);
             entity.Property(e => e.Password)
-                .HasMaxLength(50)
+                .HasMaxLength(200)
                 .IsUnicode(false);
             entity.Property(e => e.Phone)
                 .HasMaxLength(20)

@@ -1,5 +1,119 @@
 @page "/budget"
 @using PersonalFinanceTrackingSystem.App.Components.Layout
+@using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup
+@using PersonalFinanceTrackingSystem.Shared.Enums
+@using Radzen.Blazor
 @layout MainLayout
-<h3>Page_BudgetSetup</h3>
+@inject NavigationManager Navigation
+@inject BudgetSetupService _budgetSetupService
+@inject AuthenticationStateProvider authStateProvider
+@rendermode RenderMode.InteractiveServer
+@if (_formType == EnumFormType.List)
+{
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <button class="btn btn-success btn-sm mb-0" type="button" @onclick=Create>Create</button>
+                Budget
+            </h5>
+        </div>
+
+        @if (_response.ListBudget != null && _response.ListBudget.Count() > 0)
+        {
+            <div class="flex-container mt-3" style="display: flex;">
+                <div class="container-sm">
+
+                    <table class="tb table align-middle table-nowrap table-hover dataTable no-footer table-responsive">
+                        <thead>
+                            <tr>
+                                <th>Sr No.</th>
+                                <th>Budget Name</th>
+                                <th>Category Name</th>
+                                <th>Limit Amount</th>
+                                <th>From Date</th>
+                                <th>To Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int no = 0;
+                                foreach (var item in _response.ListBudget)
+                                {
+                                    <tr>
+                                        <td>@(++no)</td>
+                                        <td>@item.BudgetName</td>
+                                        <td>@item.CategoryName</td>
+                                        <td>@item.LimitAmount</td>
+                                        <td>@item.FromDate</td>
+                                        <td>@item.ToDate</td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm mb-0" type="button" @onclick="() => Edit(item.BudgetId)">Edit</button>
+                                            <button class="btn btn-danger btn-sm mb-0" type="button" @onclick="() => Delete(item.BudgetId)">Delete</button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-sm-3 ml-6" style="margin-right: -8px;">
+                <p>No Record To Show</p>
+            </div>
+        }
+    </div>
+}
+@if (_formType == EnumFormType.Create || _formType == EnumFormType.Edit)
+{
+    <div class="card">
+        <div class="card-body">
+            <h5 class="font-weight-bolder">@(_formType.ToString()) Budget</h5>
+            <div class="col-4">
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Budget Name</label>
+                    @* <input type="email" disabled=@visible class="form-control" @bind-value="_request.BudgetName"> *@
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label">Category Name</label>
+                    <textarea class="form-control" disabled=@visible @bind="_request.CategoryName"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlTextarea1" class="form-label">Limit Amount</label>
+                    <textarea class="form-control" disabled=@visible @bind="_request.LimitAmount"></textarea>
+                </div>
+                <div class="col-sm-4 mt-3">
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">From Date</RadzenText>
+                    <RadzenDatePicker @bind-Value=@_request.FromDate DateFormat="dd-MM-yyyy" Max="DateTime.Today" AllowInput="false" Class="w-100" />
+                </div>
+                <div class="col-sm-4 mt-3">
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">To Date</RadzenText>
+                    <RadzenDatePicker @bind-Value=@_request.ToDate DateFormat="dd-MM-yyyy" Max="DateTime.Today" AllowInput="false" Class="w-100" />
+                </div>
+                @*  <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label">From Date</label>
+            <textarea class="form-control" disabled=@visible @bind="_request.FromDate"></textarea>
+            </div>
+            <div class="mb-3">
+            <label for="exampleFormControlTextarea1" class="form-label">To Date</label>
+            <textarea class="form-control" disabled=@visible @bind="_request.ToDate"></textarea>
+            </div> *@
+                @*  <div class="col-12 mt-4">
+            <div class="d-flex">
+            <button @onclick=Back class="btn btn-outline-dark btn-sm mb-0 me-2" type="button">Back</button>
+            @if (_formType != EnumFormType.Detail)
+            {
+            <button class="btn btn-success btn-sm mb-0" type="button" @onclick=Save>@_formType.ToString()</button>
+            }
+
+            </div>
+            </div> *@
+            </div>
+        </div>
+    </div>
+}
 

@@ -5,15 +5,21 @@ namespace PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
 
 public partial class Tbl_Budget
 {
-    public int BudgetsId { get; set; }
+    public int Id { get; set; }
 
-    public string? UserCode { get; set; }
+    public string? BudgetId { get; set; }
+
+    public string? UserId { get; set; }
+
+    public string? CategoryName { get; set; }
 
     public string? CategoriesCode { get; set; }
 
     public decimal? LimitAmount { get; set; }
 
-    public string? PeriodType { get; set; }
+    public DateTime? FromDate { get; set; }
+
+    public DateTime? ToDate { get; set; }
 
     public DateTime? CreatedDate { get; set; }
 

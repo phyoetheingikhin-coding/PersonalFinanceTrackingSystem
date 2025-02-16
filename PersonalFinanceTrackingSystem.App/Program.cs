@@ -6,6 +6,8 @@ using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login;
 using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Register;
 using Microsoft.AspNetCore.Components.Authorization;
 using PersonalFinanceTrackingSystem.App.Service;
+using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
+using PersonalFinanceTrackingSystem.App.Service.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,10 +28,12 @@ ServiceLifetime.Transient);
 #endregion
 
 builder.Services.AddScoped<IInjectService, InjectService>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
 
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<RegisterService>();
+builder.Services.AddScoped<BudgetSetupService>();
 
 
 var app = builder.Build();

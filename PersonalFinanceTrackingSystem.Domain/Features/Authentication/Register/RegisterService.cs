@@ -3,6 +3,7 @@ using PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
 using PersonalFinanceTrackingSystem.Shared.Common;
 using System.Text;
 using System.Security.Cryptography;
+using PersonalFinanceTrackingSystem.Shared;
 
 
 namespace PersonalFinanceTrackingSystem.Domain.Features.Authentication.Register;
@@ -36,13 +37,14 @@ public class RegisterService
 
             #region Save User
 
-            var passwordHashValue = HashPassword(requestModel.Password);
-
+            //var passwordHashValue = HashPassword(requestModel.Password);
+            string hashPassword =
+                               requestModel.Password.ToSHA256HexHashString(requestModel.Name);
             var newUser = new Tbl_User
             {
                 UserId = Guid.NewGuid().ToString(),
                 UserName = requestModel.Name,
-                Password = passwordHashValue,
+                Password = hashPassword,
                 Phone = requestModel.PhoneNo,
                 Email = requestModel.Email,
                 DelFlag = false,
