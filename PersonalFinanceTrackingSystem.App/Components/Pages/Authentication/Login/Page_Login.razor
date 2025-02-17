@@ -1,61 +1,47 @@
-﻿@page "/login"
+﻿@page "/"
 @using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login;
+@using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Register
+@using PersonalFinanceTrackingSystem.App.Components.Layout
 @rendermode RenderMode.InteractiveServer
 @inject NavigationManager Navigation
 @inject LoginService _loginService
-<div class="d-flex justify-content-center align-items-center vh-100">
-    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
-        <div class="card-body">
-            <h4 class="mb-1 pt-2">Welcome 👋</h4>
-            <p class="mb-4">Please sign-in to your account and start the adventure</p>
-            @if (!string.IsNullOrEmpty(errorMessage))
-            {
-                <p style="color: red">@errorMessage</p>
-            }
-            <div class="form-floating mb-3">
-                    <div class="mb-3">
-                        <label class="form-label">UserName</label>
-                        <input class="form-control" type="text"
-                               placeholder="UserName" @bind-value="_requestModel.UserName" maxlength="11" />
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input class="form-control" type="text"
-                               placeholder="Password" @bind-value="_requestModel.Password" maxlength="11" />
-                    </div>
-                <button type="button" class="btn btn-primary w-100 py-2" @onclick=Login>SignIn</button>
-            </div>
-        </div>
-    </div>
-</div>
+@inject RegisterService _registerService
+@using MudBlazor;
+@layout EmptyLayout
 
-@code {
-    private LoginRequestModel _requestModel= new LoginRequestModel();
-    private async Task Login()
-    {
-        // Debugging - Check if values are present
-        Console.WriteLine($"Username: {_requestModel.UserName}, Password: {_requestModel.Password}");
-
-        if (string.IsNullOrWhiteSpace(_requestModel.UserName) || string.IsNullOrWhiteSpace(_requestModel.Password))
-        {
-            errorMessage = "Username and Password are required.";
-            return;
-        }
-        try
-        {
-            var result = await _loginService.Login(_requestModel);
-            if (result.UserCode == null) // Ensure result is handled properly
+<MudContainer Class="d-flex justify-center align-center min-vh-100">
+    <MudCard Class="shadow-sm p-4" Style="width: 100%; max-width: 400px;">
+        <MudCardContent>
+            @if (!_isRegister)
             {
-                errorMessage = "Invalid login attempt.";
-                return;
+                <MudText Typo="Typo.h5" Class="mb-1 pt-2">Welcome 👋</MudText>
+                <MudText Typo="Typo.body1" Class="mb-4">Please sign in to your account and start the adventure</MudText>
+                
+                <MudTextField Label="UserName" Placeholder="UserName" @bind-Value="_requestModel.UserName" MaxLength="11" Class="mb-3" />
+                <MudTextField Label="Password" Placeholder="Password" @bind-Value="_requestModel.Password" MaxLength="11" InputType="InputType.Password" Class="mb-3" />
+                
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="w-100 py-2" OnClick="Login">Sign In</MudButton>
+                
+                <MudText Typo="Typo.body2" Class="mt-3">
+                    Don't have an account? <MudLink OnClick="() => ChangePage()">Register here</MudLink>.
+                </MudText>
             }
-           // <NavMenu />
-           Navigation.NavigateTo("/dashboard", forceLoad: true);
-        } 
-        catch (Exception ex)
-        {
-            errorMessage = "An error occurred while logging in.";
-        }
-    }
-    private string errorMessage = string.Empty;
-}
+            else
+            {
+                <MudText Typo="Typo.h5" Class="mb-1 pt-2">Register</MudText>
+                <MudText Typo="Typo.body1" Class="mb-4">Please create an account to start your journey</MudText>
+                
+                <MudTextField Label="UserName" Placeholder="UserName" @bind-Value = "_requestModel.UserName" Class="mb-3" />
+                <MudTextField Label="Phone No" Placeholder="Phone No" @bind-Value="_requestModel.PhoneNo" Class="mb-3" />
+                <MudTextField Label="Password" Placeholder="Password" @bind-Value="_requestModel.Password" MaxLength="6" InputType="InputType.Password" Class="mb-3" />
+                <MudTextField Label="Confirm Password" Placeholder="Confirm Password" @bind-Value="_requestModel.ConfirmPassword" MaxLength="6" InputType="InputType.Password" Class="mb-3" />
+                
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="w-100 py-2" OnClick="Register">Register</MudButton>
+                
+                <MudText Typo="Typo.body2" Class="mt-3">
+                    Already Registered? <MudLink OnClick="() => ChangePage()">Login here</MudLink>.
+                </MudText>
+            }
+        </MudCardContent>
+    </MudCard>
+</MudContainer>

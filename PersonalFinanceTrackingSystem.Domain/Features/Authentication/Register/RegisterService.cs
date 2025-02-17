@@ -4,6 +4,7 @@ using PersonalFinanceTrackingSystem.Shared.Common;
 using System.Text;
 using System.Security.Cryptography;
 using PersonalFinanceTrackingSystem.Shared;
+using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login;
 
 
 namespace PersonalFinanceTrackingSystem.Domain.Features.Authentication.Register;
@@ -16,9 +17,9 @@ public class RegisterService
     {
         _db = db;
     }
-    public async Task<RegisterResponseModel> Register(RegisterRequestModel requestModel)
+    public async Task<LoginResponseModel> Register(LoginRequestModel requestModel)
     {
-        var model = new RegisterResponseModel();
+        var model = new LoginResponseModel();
 
         try
         {
@@ -39,14 +40,13 @@ public class RegisterService
 
             //var passwordHashValue = HashPassword(requestModel.Password);
             string hashPassword =
-                               requestModel.Password.ToSHA256HexHashString(requestModel.Name);
+                               requestModel.Password.ToSHA256HexHashString(requestModel.UserName);
             var newUser = new Tbl_User
             {
                 UserId = Guid.NewGuid().ToString(),
-                UserName = requestModel.Name,
+                UserName = requestModel.UserName,
                 Password = hashPassword,
                 Phone = requestModel.PhoneNo,
-                Email = requestModel.Email,
                 DelFlag = false,
                 CreatedDate = DateTime.Now,
                 UpdatedDate = DateTime.Now
@@ -67,11 +67,11 @@ public class RegisterService
         return model;
     }
 
-    public string HashPassword(string password)
-    {
-        using var sha256 = SHA256.Create();
-        byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return Convert.ToBase64String(hashedBytes);
-    }
+    //public string HashPassword(string password)
+    //{
+    //    using var sha256 = SHA256.Create();
+    //    byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+    //    return Convert.ToBase64String(hashedBytes);
+    //}
 
 }

@@ -17,14 +17,14 @@ public partial class Page_BudgetSetup
     {
         if (firstRender)
         {
-            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
-            var authState = await customAuthStateProvider.GetAuthenticationStateAsync();
-            if (authState.User.Identity != null && !authState.User.Identity.IsAuthenticated)
-            {
-                Navigation.NavigateTo("/login");
-                return;
-            }
-            _userSession = await customAuthStateProvider.GetUserData();
+            //var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+            //var authState = await customAuthStateProvider.GetAuthenticationStateAsync();
+            //if (authState.User.Identity != null && !authState.User.Identity.IsAuthenticated)
+            //{
+            //    Navigation.NavigateTo("/login");
+            //    return;
+            //}
+            //_userSession = await customAuthStateProvider.GetUserData();
             await List();
             StateHasChanged();
         }
@@ -33,7 +33,8 @@ public partial class Page_BudgetSetup
     }
     async Task List()
     {
-        _request.CurrentUserId = _userSession.UserId;
+        //_request.CurrentUserId = _userSession.UserId;
+        _request.CurrentUserId = "a41aa1b7-971e-471e-9cc3-f8dc120b7437";
         _response = await _budgetSetupService.List(_request);
         if (!_response.Response.IsSuccess)
         {
@@ -48,7 +49,8 @@ public partial class Page_BudgetSetup
     {
         if (!await CheckRequiredFields(_request)) return;
 
-        _request.CurrentUserId = _userSession.UserId;
+        //_request.CurrentUserId = _userSession.UserId;
+        _request.CurrentUserId = "a41aa1b7-971e-471e-9cc3-f8dc120b7437";
         if (!_request.BudgetId.IsNullOrEmpty())
         {
             _response = await _budgetSetupService.Update(_request);
@@ -106,6 +108,11 @@ public partial class Page_BudgetSetup
         _request = new BudgetSetupRequestModel();
     }
 
+    private void Cancel()
+    {
+
+    }
+
     async Task<bool> CheckRequiredFields(BudgetSetupRequestModel _request)
     {
         if (_request.CategoryName.IsNullOrEmpty())
@@ -139,4 +146,5 @@ public partial class Page_BudgetSetup
         }
         return true;
     }
+
 }

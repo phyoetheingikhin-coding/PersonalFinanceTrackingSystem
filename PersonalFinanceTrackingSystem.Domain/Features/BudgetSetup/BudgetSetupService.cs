@@ -44,6 +44,7 @@ public class BudgetSetupService
                 //        model.PageSetting = pageSetting;
                 //        model.SubjectList = lst.Skip(reqModel.PageSetting.SkipRowCount)
                 //            .Take(reqModel.PageSetting.PageSize).ToList();
+                model.ListBudget = budgetList;
                 model.Response = SubResponseModel.GetResponseMsg("", true);
 
             }
@@ -80,6 +81,7 @@ public class BudgetSetupService
             budget.ToDate = requestModel.ToDate;
             budget.LimitAmount = requestModel.LimitAmount;
             budget.CreatedDate = DateTime.Now;
+            budget.UserId = requestModel.CurrentUserId;
 
             await _db.AddAsync(budget);
             await _db.SaveChangesAsync();

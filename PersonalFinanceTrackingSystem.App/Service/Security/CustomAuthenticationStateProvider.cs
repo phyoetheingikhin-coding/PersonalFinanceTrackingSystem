@@ -26,8 +26,7 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
                 return await Task.FromResult(new AuthenticationState(_anonymous));
             var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
         {
-            new Claim(ClaimTypes.Name, userSession.UserName),
-            new Claim(ClaimTypes.Role, userSession.Role)
+            new Claim(ClaimTypes.Name, userSession.UserName,ClaimTypes.Role),
         }, AuthenticationConstants.CustomAuthFromCookie));
             return await Task.FromResult(new AuthenticationState(claimsPrincipal));
         }
@@ -40,23 +39,28 @@ public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     public async Task UpdateAuthenticationState(UserSessionModel? userSession)
     {
         ClaimsPrincipal claimsPrincipal;
-
-        if (userSession != null)
+        try
         {
-            await _protectedSessionStorage.SetAsync(AuthenticationConstants.UserSessionFromCookie, userSession);
-            claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
+            if (userSession != null)
+            {
+                await _protectedSessionStorage.SetAsync(AuthenticationConstants.UserSessionFromCookie, userSession);
+                claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
         {
-            new Claim(ClaimTypes.Name, userSession.UserName),
-            new Claim(ClaimTypes.Role, userSession.Role)
+            new Claim(ClaimTypes.Name, userSession.UserName,ClaimTypes.Role),
         }, AuthenticationConstants.CustomAuthFromCookie));
-        }
-        else
-        {
-            await _protectedSessionStorage.DeleteAsync(AuthenticationConstants.UserSessionFromCookie);
-            claimsPrincipal = _anonymous;
-        }
+            }
+            else
+            {
+                await _protectedSessionStorage.DeleteAsync(AuthenticationConstants.UserSessionFromCookie);
+                claimsPrincipal = _anonymous;
+            }
 
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
+        }
+        catch (Exception ex)
+        {
+            throw new Exception();
+        }
     }
 
     public async Task<UserSessionModel> GetUserData()

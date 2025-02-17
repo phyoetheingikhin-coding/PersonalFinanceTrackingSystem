@@ -1,12 +1,13 @@
-﻿namespace PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login
 {
     public class LoginRequestModel
     {
-        //[Required(ErrorMessage = "Username is required.")]
         public string? UserName { get; set; } 
-        //[Required(ErrorMessage = "Password is required.")]
-        public string? Password { get; set; } 
-        
-        public string UserId { get; set; }
+        public string? Password { get; set; }
+        public string PhoneNo { get; set; }
+        public string ConfirmPassword { get; set; } = string.Empty;
+
     }
 }

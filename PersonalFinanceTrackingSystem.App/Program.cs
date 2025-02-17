@@ -8,8 +8,11 @@ using Microsoft.AspNetCore.Components.Authorization;
 using PersonalFinanceTrackingSystem.App.Service;
 using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 using PersonalFinanceTrackingSystem.App.Service.Security;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddMudServices();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
