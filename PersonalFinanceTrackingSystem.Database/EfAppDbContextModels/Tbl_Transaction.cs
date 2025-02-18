@@ -7,13 +7,15 @@ public partial class Tbl_Transaction
 {
     public int Id { get; set; }
 
-    public string? UserId { get; set; }
+    public string TransactionId { get; set; } = null!;
 
-    public decimal? Amount { get; set; }
+    public string UserId { get; set; } = null!;
 
-    public string? CategoriesCode { get; set; }
+    public decimal Amount { get; set; }
 
-    public DateTime? CreatedDate { get; set; }
+    public string CategoriesCode { get; set; } = null!;
+
+    public DateTime CreatedDate { get; set; }
 
     public string? Descriptions { get; set; }
 

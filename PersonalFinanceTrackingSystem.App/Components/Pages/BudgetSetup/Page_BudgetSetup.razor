@@ -20,29 +20,33 @@
 
         @if (_response.ListBudget != null && _response.ListBudget.Count() > 0)
         {
-            <MudTable Items="_response.ListBudget" Hover="true" Dense="true" Class="mt-3">
-                <HeaderContent>
-                    <MudTh>Sr No.</MudTh>
-                    <MudTh>Budget Name</MudTh>
-                    <MudTh>Category Name</MudTh>
-                    <MudTh>Limit Amount</MudTh>
-                    <MudTh>From Date</MudTh>
-                    <MudTh>To Date</MudTh>
-                    <MudTh>Action</MudTh>
-                </HeaderContent>
-                <RowTemplate Context="item">
-                    <MudTd>@(_response.ListBudget.IndexOf(item) + 1)</MudTd>
-                    <MudTd>@item.BudgetName</MudTd>
-                    <MudTd>@item.CategoryName</MudTd>
-                    <MudTd>@item.LimitAmount</MudTd>
-                    <MudTd>@item.FromDate</MudTd>
-                    <MudTd>@item.ToDate</MudTd>
-                    <MudTd>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => Edit(item.BudgetId)">Edit</MudButton>
-                        <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="() => Delete(item.BudgetId)">Delete</MudButton>
-                    </MudTd>
-                </RowTemplate>
-            </MudTable>
+            <div style="width: 100%; overflow: auto; max-height: 400px;">
+                <MudTable Items="_response.ListBudget" Hover="true" Dense="true" Class="mt-3" Style="min-width: 100%;">
+                    <HeaderContent>
+                        <MudTh>Sr No.</MudTh>
+                        <MudTh>Budget Name</MudTh>
+                        <MudTh>Category Name</MudTh>
+                        <MudTh>Limit Amount</MudTh>
+                        <MudTh>From Date</MudTh>
+                        <MudTh>To Date</MudTh>
+                        <MudTh>Action</MudTh>
+                    </HeaderContent>
+                    <RowTemplate Context="item">
+                        <MudTd>@(_response.ListBudget.IndexOf(item) + 1)</MudTd>
+                        <MudTd>@item.BudgetName</MudTd>
+                        <MudTd>@item.CategoryName</MudTd>
+                        <MudTd>@item.LimitAmount</MudTd>
+                        <MudTd>@item.FromDate</MudTd>
+                        <MudTd>@item.ToDate</MudTd>
+                        <MudTd>
+                            <div style="display: flex; gap: 8px;">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => Edit(item.BudgetId)">Edit</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="() => Delete(item.BudgetId)">Delete</MudButton>
+                            </div>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </div>
         }
         else
         {
@@ -52,30 +56,59 @@
 }
 @if (_formType == EnumFormType.Create || _formType == EnumFormType.Edit)
 {
-<MudCard Class="shadow-lg p-4 border-0 rounded-3">
-    <MudCardContent>
-        <MudTypography Typo="Typo.h4" Class="text-primary fw-bold mb-4">@(_formType.ToString()) Budget</MudTypography>
-        <MudGrid Container Spacing="2">
-            <MudItem Sm="6">
-                @* <MudTextField Label="Budget Name" @bind-Value="_request.BudgetName" Disabled="@visible" /> *@
-            </MudItem>
-            <MudItem Sm="6">
-                <MudTextField Label="Category Name" @bind-Value="_request.CategoryName" Disabled="@visible" />
-            </MudItem>
-            <MudItem Sm="6">
-                <MudTextField Label="Limit Amount" Type="number" @bind-Value="_request.LimitAmount" Disabled="@visible" />
-            </MudItem>
-            <MudItem Sm="6">
-                <MudDatePicker Label="From Date" @bind-Date="_request.FromDate" DateFormat="dd-MM-yyyy" MaxDate="DateTime.Today" />
-            </MudItem>
-            <MudItem Sm="6">
-                <MudDatePicker Label="To Date" @bind-Date="_request.ToDate" DateFormat="dd-MM-yyyy" MaxDate="DateTime.Today" />
-            </MudItem>
-            <MudItem Sm="6">
-                <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save</MudButton>
-            </MudItem>
-        </MudGrid>
-    </MudCardContent>
-</MudCard>}
+    <MudCard Class="shadow-lg p-4 border-0 rounded-3">
+        <MudCardContent>
+            <MudTypography Typo="Typo.h4" Class="text-primary fw-bold mb-4">@(_formType.ToString()) Budget</MudTypography>
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudRadioGroup @bind-Value="_request.FinanceType">
+                        <MudRadio Value="@("expense")" Color="Color.Primary" Size="Size.Small">Expense</MudRadio>
+                        <MudRadio Value="@("income")" Color="Color.Secondary" Size="Size.Medium">Income</MudRadio>
+                    </MudRadioGroup>
+                </MudItem >
+                <MudItem xs="12" sm="6">
+                    @* <MudTextField Label="Category Name" @bind-Value="_request.CategoryName" Disabled="@visible"/> *@
+                    <MudSelect T="string" @bind-Value="_request.CategoryName" Label="Select Category Name " Variant="Variant.Filled" Clearable>
+                        @if (_lstCategory is not null && _lstCategory.Count() > 0)
+                        {
+                            foreach (var item in _lstCategory)
+                            {
+                                <MudSelectItem T="string" Value="@item.CategoryName"> @item.CategoryName </MudSelectItem>
+                            }
+                        }
 
+                    </MudSelect>
+                    @* <select @bind="_request.CategoryName" class="form-select"> *@
+                    @*     <option value="">Select Category Name</option> *@
+                    @*     @foreach (var item in _lstCategory) *@
+                    @*     { *@
+                    @*         <option value="@item.CategoryName">@item.CategoryName</option> *@
+                    @*     } *@
+                    @* </select> *@
+
+                </MudItem >
+                <div class="mb-3">
+                    <label for="limitDate" class="form-label">From Date</label>
+                    <InputDate id="limitDate" class="form-control"
+                               @bind-Value="_request.FromDate"
+                               disabled="@visible"/>
+                </div>
+
+                @* <MudItem xs="12" sm="6"> *@
+                @*     <MudTextField Label="Limit Amount" Type="number" @bind-Value="_request.LimitAmount" Disabled="@visible"/> *@
+                @* </MudItem> *@
+                @* <MudItem xs="12" sm="6"> *@
+                @*     <MudDatePicker Label="From Date" @bind-Date="_request.FromDate" DateFormat="dd-MM-yyyy" MaxDate="DateTime.Today"/> *@
+                @* </MudItem> *@
+                @* <MudItem xs="12" sm="6"> *@
+                @*     <MudDatePicker Label="To Date" @bind-Date="_request.ToDate" DateFormat="dd-MM-yyyy" MaxDate="DateTime.Today"/> *@
+                @* </MudItem> *@
+                <MudItem xs="12" sm="6">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save</MudButton>
+                </MudItem>
+            </MudGrid >
+
+        </MudCardContent >
+    </MudCard>
+}

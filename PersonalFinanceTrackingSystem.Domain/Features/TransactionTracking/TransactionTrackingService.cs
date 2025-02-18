@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
+using PersonalFinanceTrackingSystem.Shared.Common;
 
 namespace PersonalFinanceTrackingSystem.Domain.Features.TransactionTracking;
 
@@ -12,11 +13,175 @@ public class TransactionTrackingService
         _db = db;
     }
 
-    public async Task<TrackTransactionResponseModel> TrackTransactionByCategory(TrackTransactionRequestModel requestModel)
+    public async Task<TrackTransactionResponseModel> List(TrackTransactionRequestModel request)
+    {
+        TrackTransactionResponseModel model = new TrackTransactionResponseModel();
+        try
+        {
+            var user = await _db.Tbl_Users.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == request.CurrentUserId);
+            if (user is null)
+            {
+                model.Response = SubResponseModel.GetResponseMsg("", false);
+                return model;
+            }
+
+            var transaction = await _db.Tbl_Transactions.AsNoTracking()
+                .Where(x => x.UserId == user.UserId)
+                .Select(x => new TransactionDataModel()
+                {
+                    TranDate = x.CreatedDate,
+                    Amount = x.Amount,
+                    UserName = user.UserName,
+                    FinanceType = x.TransactionType,
+                    //Description = x.Note,
+                    //CategoryName = x.CategoriesName
+                })
+                .ToListAsync();
+            model.TransactionList = transaction;
+            model.Response = SubResponseModel.GetResponseMsg("Success", true);
+        }
+        catch (Exception ex)
+        {
+            model.Response = SubResponseModel.GetResponseMsg("Error", false);
+        }
+
+        return model;
+    }
+
+    public async Task<TrackTransactionResponseModel> Update(TrackTransactionRequestModel request)
+    {
+        var model = new TrackTransactionResponseModel();
+        try
+        {
+            var transaction = await _db.Tbl_Transactions.AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.TransactionId == request.TransactionId &&
+                    x.UserId == request.CurrentUserId);
+
+            if (transaction is null)
+            {
+                model.Response = SubResponseModel.GetResponseMsg("No Data found", false);
+                return model;
+            }
+
+            transaction.Descriptions = request.Description;
+            transaction.TransactionType = request.FinanceType;
+            transaction.Amount = request.Amount;
+            transaction.CategoriesCode = request.CategoryName;
+            //transaction.UpdatedDate = DateTime.Now;
+            _db.Entry(transaction).State = EntityState.Modified;
+            await _db.SaveChangesAsync();
+            model.Response = SubResponseModel.GetResponseMsg("Updated Successful!", true);
+        }
+        catch (Exception ex)
+        {
+            model.Response = SubResponseModel.GetResponseMsg($"{ex.Message}", false);
+        }
+
+        return model;
+    }
+
+    public async Task<TrackTransactionResponseModel> Edit(string tranId)
+    {
+        TrackTransactionResponseModel model = new TrackTransactionResponseModel();
+        TransactionDataModel dataModel = new TransactionDataModel();
+        try
+        {
+            var item = await _db.Tbl_Transactions.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.TransactionId == tranId
+                );
+            if (item == null)
+            {
+                model.Response = SubResponseModel.GetResponseMsg("No Data Found!", false);
+                return model;
+            }
+
+            dataModel.CategoryName = item.CategoriesCode;
+            dataModel.Amount = item.Amount;
+            dataModel.Descriptions = item.Descriptions;
+            dataModel.TranDate = item.CreatedDate;
+            dataModel.FinanceType = item.TransactionType;
+            dataModel.TransactionId = item.TransactionId;
+
+            model.TransactionData = dataModel;
+            model.Response = SubResponseModel.GetResponseMsg("", true);
+        }
+        catch (Exception ex)
+        {
+            model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
+        }
+
+        return model;
+    }
+
+    public async Task<TrackTransactionResponseModel> Delete(TrackTransactionRequestModel request)
+    {
+        TrackTransactionResponseModel model = new TrackTransactionResponseModel();
+        try
+        {
+            var item = await _db.Tbl_Transactions.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.TransactionId == request.TransactionId &&
+                                          x.UserId == request.CurrentUserId);
+            if (item is null)
+            {
+                model.Response = SubResponseModel.GetResponseMsg("No Data Found", false);
+                return model;
+            }
+            //item.DelFlag = true;
+            //_db.Entry(item).State = EntityState.Modified;
+            _db.Remove(item);
+            await _db.SaveChangesAsync();
+            model.Response = SubResponseModel.GetResponseMsg("Deleted Successful", true);
+        }
+        catch (Exception ex)
+        {
+            model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
+        }
+
+        return model;
+    }
+
+    public async Task<TrackTransactionResponseModel> Create(TrackTransactionRequestModel request)
+    {
+        var model = new TrackTransactionResponseModel();
+        try
+        {
+            #region Check user
+
+            var user = await _db.Tbl_Users.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == request.CurrentUserId.ToString());
+            if (user is null)
+            {
+                model.Response = SubResponseModel.GetResponseMsg("User does not exist!", false);
+                return model;
+            }
+
+            #endregion
+
+            Tbl_Transaction item = new Tbl_Transaction()
+            {
+                TransactionId = Guid.NewGuid().ToString(),
+                //TransactionId = Ulid.NewUlid().ToString(),
+            };
+            await _db.AddAsync(item);
+            await _db.SaveChangesAsync();
+            model.Response = SubResponseModel.GetResponseMsg("Budget Setup Successful", true);
+        }
+        catch (Exception ex)
+        {
+            model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
+        }
+
+        return model;
+    }
+
+    public async Task<TrackTransactionResponseModel> TrackTransactionByCategory(
+        TrackTransactionRequestModel requestModel)
     {
         var model = new TrackTransactionResponseModel();
         var category = await _db.Tbl_Categories.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == requestModel.CategoriesType);
+            .FirstOrDefaultAsync(x => x.Name == requestModel.CategoryName);
         if (category is null)
         {
             goto result;
@@ -27,16 +192,16 @@ public class TransactionTrackingService
                                       x.CategoriesCode == category.CategoriesCode);
         if (transaction is not null)
         {
-           // model.Amount = transaction.Amount;
+            // model.Amount = transaction.Amount;
             model.CategoriesName = category.Name;
-           // model.TransactionDate = transaction.CreatedDate;
+            // model.TransactionDate = transaction.CreatedDate;
         }
+
         result:
         return model;
     }
 
-    public void AddTransaction(TransactionRequestModel requestModel)
+    public void AddTransaction(TransactionDataModel dataModel)
     {
-        
     }
 }

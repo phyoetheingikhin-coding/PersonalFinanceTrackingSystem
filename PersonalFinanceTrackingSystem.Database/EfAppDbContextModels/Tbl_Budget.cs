@@ -9,6 +9,8 @@ public partial class Tbl_Budget
 
     public string? BudgetId { get; set; }
 
+    public string? BudgetName { get; set; }
+
     public string? UserId { get; set; }
 
     public string? CategoryName { get; set; }

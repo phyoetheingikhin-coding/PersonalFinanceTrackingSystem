@@ -12,29 +12,32 @@ public partial class Page_BudgetSetup
     private BudgetSetupResponseModel _response = new();
     private UserSessionModel _userSession = new();
     private EnumFormType _formType = EnumFormType.List;
+    private IEnumerable<CategoryDataModel> _lstCategory;
     bool visible = false;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            //var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
-            //var authState = await customAuthStateProvider.GetAuthenticationStateAsync();
-            //if (authState.User.Identity != null && !authState.User.Identity.IsAuthenticated)
-            //{
-            //    Navigation.NavigateTo("/login");
-            //    return;
-            //}
-            //_userSession = await customAuthStateProvider.GetUserData();
+            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+            var authState = await customAuthStateProvider.GetAuthenticationStateAsync();
+            if (authState.User.Identity != null && !authState.User.Identity.IsAuthenticated)
+            {
+                Navigation.NavigateTo("/login");
+                return;
+            }
+            
+            _userSession = await customAuthStateProvider.GetUserData();
             await List();
+            await GetCategoryList();
             StateHasChanged();
         }
-
-
     }
+
     async Task List()
     {
-        //_request.CurrentUserId = _userSession.UserId;
-        _request.CurrentUserId = "a41aa1b7-971e-471e-9cc3-f8dc120b7437";
+        _request.CurrentUserId = _userSession.UserId;
+        //_request.CurrentUserId = "a41aa1b7-971e-471e-9cc3-f8dc120b7437";
         _response = await _budgetSetupService.List(_request);
         if (!_response.Response.IsSuccess)
         {
@@ -49,8 +52,8 @@ public partial class Page_BudgetSetup
     {
         if (!await CheckRequiredFields(_request)) return;
 
-        //_request.CurrentUserId = _userSession.UserId;
-        _request.CurrentUserId = "a41aa1b7-971e-471e-9cc3-f8dc120b7437";
+        _request.CurrentUserId = _userSession.UserId;
+        //_request.CurrentUserId = "a41aa1b7-971e-471e-9cc3-f8dc120b7437";
         if (!_request.BudgetId.IsNullOrEmpty())
         {
             _response = await _budgetSetupService.Update(_request);
@@ -65,6 +68,7 @@ public partial class Page_BudgetSetup
             await _injectService.ErrorMessage(_response.Response.Message);
             return;
         }
+
         await _injectService.SuccessMessage(_response.Response.Message);
         await List();
     }
@@ -81,6 +85,7 @@ public partial class Page_BudgetSetup
             await _injectService.ErrorMessage(data.Response.Message);
             return;
         }
+
         await _injectService.SuccessMessage(data.Response.Message);
         await List();
         StateHasChanged();
@@ -95,6 +100,7 @@ public partial class Page_BudgetSetup
             await _injectService.ErrorMessage(data.Response.Message);
             return;
         }
+
         _request.CategoryName = data.BudgetSetup.CategoryName;
         _request.LimitAmount = (decimal)data.BudgetSetup.LimitAmount!;
         _request.FromDate = (DateTime)data.BudgetSetup.FromDate!;
@@ -104,13 +110,31 @@ public partial class Page_BudgetSetup
 
     private void Create()
     {
-        _formType = EnumFormType.Create;
-        _request = new BudgetSetupRequestModel();
+        try
+        {
+            _formType = EnumFormType.Create;
+            _request = new BudgetSetupRequestModel();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
     }
 
-    private void Cancel()
+    async Task Cancel()
     {
+        _request = new BudgetSetupRequestModel();
+        visible = false;
+        await List();
+        _formType = EnumFormType.List;
+        StateHasChanged();
+    }
 
+    private async Task GetCategoryList()
+    {
+        var result = await _budgetSetupService.GetCategoryList("expense");
+        _lstCategory = result.ListCategory;
     }
 
     async Task<bool> CheckRequiredFields(BudgetSetupRequestModel _request)
@@ -144,7 +168,7 @@ public partial class Page_BudgetSetup
             await _injectService.ErrorMessage("End Date must be greater than Start Date.");
             return false;
         }
+
         return true;
     }
-
 }

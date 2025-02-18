@@ -9,5 +9,8 @@ public class BudgetSetupRequestModel: BaseRequestModel
     public decimal LimitAmount { get; set; }
     public DateTime? FromDate { get; set; }= DateTime.Now;
     public DateTime? ToDate { get; set; }=DateTime.Now;
+    public string FinanceType { get; set; }
+    
+    public string BudgetName { get; set; }
     
 }

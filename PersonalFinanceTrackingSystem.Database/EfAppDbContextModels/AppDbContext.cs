@@ -25,11 +25,15 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Tbl_User> Tbl_Users { get; set; }
 
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Tbl_Budget>(entity =>
         {
             entity.Property(e => e.BudgetId)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.BudgetName)
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.CategoriesCode)
@@ -83,6 +87,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Descriptions)
                 .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.TransactionId)
+                .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.TransactionType)
                 .HasMaxLength(50)
