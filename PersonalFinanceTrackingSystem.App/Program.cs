@@ -9,6 +9,7 @@ using PersonalFinanceTrackingSystem.App.Service;
 using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 using PersonalFinanceTrackingSystem.App.Service.Security;
 using MudBlazor.Services;
+using Radzen;
 
 var builder = WebApplication.CreateBuilder(args);
 

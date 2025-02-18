@@ -23,7 +23,7 @@ public partial class Page_BudgetSetup
             var authState = await customAuthStateProvider.GetAuthenticationStateAsync();
             if (authState.User.Identity != null && !authState.User.Identity.IsAuthenticated)
             {
-                Navigation.NavigateTo("/login");
+                Navigation.NavigateTo("/");
                 return;
             }
             
@@ -105,13 +105,17 @@ public partial class Page_BudgetSetup
         _request.LimitAmount = (decimal)data.BudgetSetup.LimitAmount!;
         _request.FromDate = (DateTime)data.BudgetSetup.FromDate!;
         _request.ToDate = (DateTime)data.BudgetSetup.ToDate!;
+        _request.BudgetName = data.BudgetSetup.BudgetName;
+        _request.FinanceType = data.BudgetSetup.FinanceType;
         _formType = EnumFormType.Edit;
     }
 
-    private void Create()
+    private async Task Create()
     {
         try
         {
+            await GetCategoryList();
+            var item = _lstCategory;
             _formType = EnumFormType.Create;
             _request = new BudgetSetupRequestModel();
             StateHasChanged();
@@ -131,9 +135,10 @@ public partial class Page_BudgetSetup
         StateHasChanged();
     }
 
-    private async Task GetCategoryList()
+     async Task GetCategoryList()
     {
-        var result = await _budgetSetupService.GetCategoryList("expense");
+        _request.FinanceType = "expense";
+        var result = await _budgetSetupService.GetCategoryList(_request.FinanceType);
         _lstCategory = result.ListCategory;
     }
 

@@ -15,5 +15,6 @@ namespace PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup
         public decimal? LimitAmount { get; set; }
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; } 
+        public string FinanceType { get; set; }
     }
 }

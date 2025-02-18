@@ -2,7 +2,8 @@
 @inherits LayoutComponentBase
 
 @* Required *@
-<MudThemeProvider />
+@* <MudThemeProvider /> *@
+<MudThemeProvider @rendermode="InteractiveServer" />
 <MudPopoverProvider />
 
 @* Needed for dialogs *@
@@ -22,7 +23,11 @@
         </div>
 
         <article class="content px-4">
-            @Body
+            <MudLayout>
+                <MudMainContent>
+                    @Body
+                </MudMainContent>
+            </MudLayout>
         </article>
     </main>
 </div>

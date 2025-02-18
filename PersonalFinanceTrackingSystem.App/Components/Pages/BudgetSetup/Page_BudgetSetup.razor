@@ -8,6 +8,8 @@
 @inject AuthenticationStateProvider authStateProvider
 @rendermode RenderMode.InteractiveServer
 @using MudBlazor;
+@using Radzen;
+@using Variant = MudBlazor.Variant
 @if (_formType == EnumFormType.List)
 {
     <MudCard>
@@ -56,59 +58,71 @@
 }
 @if (_formType == EnumFormType.Create || _formType == EnumFormType.Edit)
 {
-    <MudCard Class="shadow-lg p-4 border-0 rounded-3">
-        <MudCardContent>
-            <MudTypography Typo="Typo.h4" Class="text-primary fw-bold mb-4">@(_formType.ToString()) Budget</MudTypography>
-            <MudGrid>
-                <MudItem xs="12" sm="6">
-                    <MudRadioGroup @bind-Value="_request.FinanceType">
-                        <MudRadio Value="@("expense")" Color="Color.Primary" Size="Size.Small">Expense</MudRadio>
-                        <MudRadio Value="@("income")" Color="Color.Secondary" Size="Size.Medium">Income</MudRadio>
-                    </MudRadioGroup>
-                </MudItem >
-                <MudItem xs="12" sm="6">
-                    @* <MudTextField Label="Category Name" @bind-Value="_request.CategoryName" Disabled="@visible"/> *@
-                    <MudSelect T="string" @bind-Value="_request.CategoryName" Label="Select Category Name " Variant="Variant.Filled" Clearable>
-                        @if (_lstCategory is not null && _lstCategory.Count() > 0)
-                        {
-                            foreach (var item in _lstCategory)
-                            {
-                                <MudSelectItem T="string" Value="@item.CategoryName"> @item.CategoryName </MudSelectItem>
-                            }
-                        }
-
-                    </MudSelect>
-                    @* <select @bind="_request.CategoryName" class="form-select"> *@
-                    @*     <option value="">Select Category Name</option> *@
-                    @*     @foreach (var item in _lstCategory) *@
-                    @*     { *@
-                    @*         <option value="@item.CategoryName">@item.CategoryName</option> *@
-                    @*     } *@
-                    @* </select> *@
-
-                </MudItem >
-                <div class="mb-3">
-                    <label for="limitDate" class="form-label">From Date</label>
-                    <InputDate id="limitDate" class="form-control"
-                               @bind-Value="_request.FromDate"
-                               disabled="@visible"/>
+    <div class="card shadow-lg p-4 border-0 rounded-3">
+        <div class="card-body">
+            <h4 class="text-primary fw-bold mb-4">@(_formType.ToString()) Budget</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Finance Type</label>
+                        <MudRadioGroup @bind-Value="_request.FinanceType">
+                            <MudRadio Value="@("expense")" Color="Color.Primary" Size="Size.Small">Expense</MudRadio>
+                            <MudRadio Value="@("income")" Color="Color.Secondary" Size="Size.Medium">Income</MudRadio>
+                        </MudRadioGroup>
+                    </div>
                 </div>
-
-                @* <MudItem xs="12" sm="6"> *@
-                @*     <MudTextField Label="Limit Amount" Type="number" @bind-Value="_request.LimitAmount" Disabled="@visible"/> *@
-                @* </MudItem> *@
-                @* <MudItem xs="12" sm="6"> *@
-                @*     <MudDatePicker Label="From Date" @bind-Date="_request.FromDate" DateFormat="dd-MM-yyyy" MaxDate="DateTime.Today"/> *@
-                @* </MudItem> *@
-                @* <MudItem xs="12" sm="6"> *@
-                @*     <MudDatePicker Label="To Date" @bind-Date="_request.ToDate" DateFormat="dd-MM-yyyy" MaxDate="DateTime.Today"/> *@
-                @* </MudItem> *@
-                <MudItem xs="12" sm="6">
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">Save</MudButton>
-                </MudItem>
-            </MudGrid >
-
-        </MudCardContent >
-    </MudCard>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Budget Name</label>
+                        <input type="text" class="form-control" disabled=@visible @bind-value="_request.BudgetName">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Category Name</label>
+                        <select @bind="_request.CategoryName" class="form-select">
+                            <option value="">Select Category Name</option>
+                            @foreach (var item in _lstCategory)
+                            {
+                                <option value="@item.CategoryName">@item.CategoryName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Limit Amount</label>
+                        <input type="number" class="form-control" disabled=@visible @bind-value="_request.LimitAmount">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        @* <label class="form-label">From Date</label> *@
+                        @* <input type="date" class="form-control" @bind="_request.FromDate" DateFormat="dd-MM-yyyy" Max="DateTime.Today"> *@
+                        <label for="limitDate" class="form-label">From Date</label>
+                        <InputDate id="limitDate" class="form-control"
+                                   @bind-Value="_request.FromDate"
+                                   disabled="@visible"/>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        @* <label class="form-label">To Date</label> *@
+                        @* <input type="date" class="form-control" @bind="_request.ToDate" DateFormat="dd-MM-yyyy" Max="DateTime.Today"> *@
+                        <label for="limitDate" class="form-label">To Date</label>
+                        <InputDate id="limitDate" class="form-control"
+                                   @bind-Value="_request.ToDate"
+                                   disabled="@visible"/>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mt-7">
+                        <label for="limitDate" class="form-label"></label>
+                        <button type="button" class="btn btn-secondary me-2" @onclick="Cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary" @onclick="Save">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 }
