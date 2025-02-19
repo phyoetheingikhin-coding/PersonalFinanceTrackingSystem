@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using PersonalFinanceTrackingSystem.Shared.Common;
 using System.Security.Claims;
 
 namespace PersonalFinanceTrackingSystem.App.Service.Security;

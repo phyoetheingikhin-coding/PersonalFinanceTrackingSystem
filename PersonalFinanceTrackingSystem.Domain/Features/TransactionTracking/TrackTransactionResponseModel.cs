@@ -1,3 +1,4 @@
+using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 using PersonalFinanceTrackingSystem.Shared.Common;
 
 namespace PersonalFinanceTrackingSystem.Domain.Features.TransactionTracking;
@@ -5,7 +6,7 @@ namespace PersonalFinanceTrackingSystem.Domain.Features.TransactionTracking;
 public class TrackTransactionResponseModel
 {
     public List<TransactionDataModel>TransactionList { get; set; }
-    
+    public List<CategoryDataModel>ListCategory { get; set; }
     public TransactionDataModel TransactionData { get; set; }
     public ResponseModel Response { get; set; }
     public string UserName { get; set; }

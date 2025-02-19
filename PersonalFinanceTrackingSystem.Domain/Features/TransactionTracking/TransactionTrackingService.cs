@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
+using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 using PersonalFinanceTrackingSystem.Shared.Common;
 
 namespace PersonalFinanceTrackingSystem.Domain.Features.TransactionTracking;
@@ -203,5 +205,32 @@ public class TransactionTrackingService
 
     public void AddTransaction(TransactionDataModel dataModel)
     {
+    }
+    
+    public async Task<TrackTransactionResponseModel> GetCategoryList(string financeType)
+    {
+        TrackTransactionResponseModel model = new TrackTransactionResponseModel();
+        CategoryDataModel catData = new CategoryDataModel();
+        try
+        {
+            var item = await _db.Tbl_Categories.AsNoTracking()
+                .Where(x => x.Type == financeType)
+                .Select(x => new CategoryDataModel
+                {
+                    CategoryCode = x.CategoriesCode,
+                    CategoryName = x.Name
+                }).ToListAsync();
+            if (!item.IsNullOrEmpty())
+            {
+                model.ListCategory = item;
+                model.Response = SubResponseModel.GetResponseMsg("", true);
+            }
+        }
+        catch (Exception ex)
+        {
+            model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
+        }
+
+        return model;
     }
 }

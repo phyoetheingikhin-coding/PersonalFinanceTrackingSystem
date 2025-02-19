@@ -38,6 +38,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStat
 builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<RegisterService>();
 builder.Services.AddScoped<BudgetSetupService>();
+builder.Services.AddScoped<TransactionTrackingService>();
 
 
 var app = builder.Build();

@@ -2,7 +2,6 @@
 using PersonalFinanceTrackingSystem.App.Service.Security;
 using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login;
 using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Register;
-using PersonalFinanceTrackingSystem.Shared.Common;
 
 namespace PersonalFinanceTrackingSystem.App.Components.Pages.Authentication.Login;
 

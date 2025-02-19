@@ -1,8 +1,6 @@
 using Microsoft.IdentityModel.Tokens;
 using PersonalFinanceTrackingSystem.App.Service.Security;
 using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
-using PersonalFinanceTrackingSystem.Shared.Common;
-using PersonalFinanceTrackingSystem.Shared.Enums;
 
 namespace PersonalFinanceTrackingSystem.App.Components.Pages.BudgetSetup;
 
