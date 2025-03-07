@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.IdentityModel.Tokens;
 using PersonalFinanceTrackingSystem.App.Service.Security;
 using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
@@ -12,6 +13,7 @@ public partial class Page_BudgetSetup
     private EnumFormType _formType = EnumFormType.List;
     private IEnumerable<CategoryDataModel> _lstCategory;
     bool visible = false;
+    private int value = 0;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -27,7 +29,7 @@ public partial class Page_BudgetSetup
 
             _userSession = await customAuthStateProvider.GetUserData();
             await List();
-            await GetCategoryList();
+            //await GetCategoryList();
             StateHasChanged();
         }
     }
@@ -35,7 +37,6 @@ public partial class Page_BudgetSetup
     async Task List()
     {
         _request.CurrentUserId = _userSession.UserId;
-        //_request.CurrentUserId = "a41aa1b7-971e-471e-9cc3-f8dc120b7437";
         _response = await _budgetSetupService.List(_request);
         if (!_response.Response.IsSuccess)
         {
@@ -51,7 +52,6 @@ public partial class Page_BudgetSetup
         if (!await CheckRequiredFields(_request)) return;
 
         _request.CurrentUserId = _userSession.UserId;
-        //_request.CurrentUserId = "a41aa1b7-971e-471e-9cc3-f8dc120b7437";
         if (!_request.BudgetId.IsNullOrEmpty())
         {
             _response = await _budgetSetupService.Update(_request);
@@ -113,8 +113,8 @@ public partial class Page_BudgetSetup
     {
         try
         {
+            _request.FinanceType = "Expense";
             await GetCategoryList();
-           //var item = _lstCategory;
             _formType = EnumFormType.Create;
             _request = new BudgetSetupRequestModel();
             StateHasChanged();
@@ -123,6 +123,11 @@ public partial class Page_BudgetSetup
         {
             Console.WriteLine(ex);
         }
+    }
+    private async Task OnFinanceTypeChanged(int value)
+    {
+        _request.FinanceType = value == 0 ? "Expense" : "Income";
+        await GetCategoryList();
     }
 
     async Task Cancel()
@@ -136,7 +141,6 @@ public partial class Page_BudgetSetup
 
     async Task GetCategoryList()
     {
-        _request.FinanceType = "expense";
         var result = await _budgetSetupService.GetCategoryList(_request.FinanceType);
         _lstCategory = result.ListCategory;
     }

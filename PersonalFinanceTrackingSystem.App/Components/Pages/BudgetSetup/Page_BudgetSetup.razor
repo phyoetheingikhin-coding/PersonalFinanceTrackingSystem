@@ -64,10 +64,12 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Finance Type</label>
-                            <MudRadioGroup @bind-Value="_request.FinanceType">
-                                <MudRadio Value="@("expense")" Color="Color.Primary" Size="Size.Small">Expense</MudRadio>
-                                <MudRadio Value="@("income")" Color="Color.Secondary" Size="Size.Medium">Income</MudRadio>
-                            </MudRadioGroup>
+                            <RadzenRadioButtonList @bind-Value="@value" Change=@(args => OnFinanceTypeChanged(args)) TValue="int">
+                                <Items>
+                                    <RadzenRadioButtonListItem Text="Expense" Value="0" />
+                                    <RadzenRadioButtonListItem Text="Income" Value="1" />
+                                </Items>
+                            </RadzenRadioButtonList>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -78,13 +80,6 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            @* <label class="form-label">Category Name</label> *@
-                            @* <select @bind="_request.CategoryCode" class="form-select"> *@
-                            @*     @foreach (var item in _lstCategory) *@
-                            @*     { *@
-                            @*         <option value="@item.CategoryCode">@item.CategoryName</option> *@
-                            @*     } *@
-                            @* </select> *@
                             <label for="exampleFormControlInput1" class="form-label">Category Name</label>
                             <RadzenDropDown AllowClear="true" TValue="string"
                                             FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive"

@@ -214,7 +214,7 @@ public class BudgetSetupService
         try
         {
             var item = await _db.Tbl_Categories.AsNoTracking()
-                .Where(x => x.Type == financeType)
+                .Where(x => x.Type.ToLower() == financeType.ToLower())
                 .Select(x => new CategoryDataModel
                 {
                     CategoryCode = x.CategoriesCode,
