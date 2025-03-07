@@ -11,6 +11,7 @@ namespace PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup
         public string BudgetId {  get; set; }
         public string UserName {  get; set; }
         public string CategoryName { get; set; }
+        public string CategoryCode{ get; set; }
         public string BudgetName { get; set; }
         public decimal? LimitAmount { get; set; }
         public DateTime? FromDate { get; set; }

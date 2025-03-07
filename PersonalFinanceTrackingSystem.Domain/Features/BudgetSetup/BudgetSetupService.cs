@@ -85,6 +85,7 @@ public class BudgetSetupService
             budget.BudgetId = Guid.NewGuid().ToString();
             budget.BudgetName = requestModel.BudgetName;
             budget.CategoryName = category.Name;
+            budget.CategoriesCode = requestModel.CategoryCode;
             budget.FromDate = requestModel.FromDate;
             budget.ToDate = requestModel.ToDate;
             budget.LimitAmount = requestModel.LimitAmount;
@@ -116,9 +117,20 @@ public class BudgetSetupService
                 model.Response = SubResponseModel.GetResponseMsg("No Data Found!", false);
                 return model;
             }
+            #region Check Category Code
+
+            var category = await _db.Tbl_Categories.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CategoriesCode == requestModel.CategoryCode);
+            if (category is null)
+            {
+                model.Response = SubResponseModel.GetResponseMsg("Category does not exist!", false);
+                return model;
+            }
+
+            #endregion
 
             item.BudgetName = requestModel.BudgetName;
-            item.CategoryName = requestModel.CategoryName;
+            item.CategoryName = category.Name;
             item.LimitAmount = requestModel.LimitAmount;
             item.FromDate = requestModel.FromDate;
             item.ToDate = requestModel.ToDate;
@@ -168,7 +180,8 @@ public class BudgetSetupService
         BudgetSetupDataModel dataModel = new BudgetSetupDataModel();
         try
         {
-            var item = await _db.Tbl_Budgets.AsNoTracking().FirstOrDefaultAsync(x => x.BudgetId == budgetId);
+            var item = await _db.Tbl_Budgets.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.BudgetId == budgetId);
             if (item == null)
             {
                 model.Response = SubResponseModel.GetResponseMsg("No Data Found!", false);
@@ -180,6 +193,8 @@ public class BudgetSetupService
             dataModel.FromDate = item.FromDate;
             dataModel.ToDate = item.ToDate;
             dataModel.CategoryName = item.CategoryName;
+            dataModel.CategoryCode = item.CategoriesCode;
+            
 
             model.BudgetSetup = dataModel;
             model.Response = SubResponseModel.GetResponseMsg("", true);

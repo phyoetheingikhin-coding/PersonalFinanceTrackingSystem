@@ -6,6 +6,7 @@
 @inject BudgetSetupService _budgetSetupService
 @rendermode RenderMode.InteractiveServer
 @using MudBlazor;
+@using Radzen.Blazor; 
 @using Variant = MudBlazor.Variant
 @if (_formType == EnumFormType.List)
 {
@@ -77,13 +78,21 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label">Category Name</label>
-                            <select @bind="_request.CategoryCode" class="form-select">
-                                @foreach (var item in _lstCategory)
-                                {
-                                    <option value="@item.CategoryCode">@item.CategoryName</option>
-                                }
-                            </select>
+                            @* <label class="form-label">Category Name</label> *@
+                            @* <select @bind="_request.CategoryCode" class="form-select"> *@
+                            @*     @foreach (var item in _lstCategory) *@
+                            @*     { *@
+                            @*         <option value="@item.CategoryCode">@item.CategoryName</option> *@
+                            @*     } *@
+                            @* </select> *@
+                            <label for="exampleFormControlInput1" class="form-label">Category Name</label>
+                            <RadzenDropDown AllowClear="true" TValue="string"
+                                            FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive"
+                                            AllowFiltering="true" Class="w-100" Disabled="@visible"
+                                            Placeholder="Select" Data=@_lstCategory
+                                            Value="@_request.CategoryCode"
+                                            TextProperty="CategoryName" ValueProperty="CategoryCode"
+                                            Change=@(args => { if (args != null) _request.CategoryCode = args.ToString(); else _request.CategoryCode = null;}) />
                         </div>
                     </div>
                     <div class="col-md-6">
