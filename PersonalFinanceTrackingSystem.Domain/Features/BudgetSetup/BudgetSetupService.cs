@@ -18,15 +18,36 @@ public class BudgetSetupService
     public async Task<BudgetSetupResponseModel> List(BudgetSetupRequestModel requestModel)
     {
         BudgetSetupResponseModel model = new BudgetSetupResponseModel();
-        //    PageSettingResponseModel pageSetting = new();
+        PageSettingResponseModel pageSetting = new();
         try
         {
             var user = await _db.Tbl_Users.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserId == requestModel.CurrentUserId.ToString());
+                .FirstOrDefaultAsync(x => x.UserId == requestModel.CurrentUserId);
             if (user is not null)
             {
+                // var query = _db.Tbl_Budgets.AsNoTracking()
+                //     .Where(x => x.UserId == requestModel.CurrentUserId);
+                //
+                // var budgetList = await query
+                //     .Skip((requestModel.PageNumber - 1) * requestModel.PageSize)
+                //     .Take(requestModel.PageSize)
+                //     .Select(x => new BudgetSetupDataModel
+                //     {
+                //         BudgetId = x.BudgetId,
+                //         BudgetName = x.BudgetName,
+                //         CategoryName = x.CategoryName,
+                //         UserName = user.UserName,
+                //         FromDate = x.FromDate,
+                //         ToDate = x.ToDate,
+                //         LimitAmount = x.LimitAmount,
+                //     })
+                //     .ToListAsync();
+                // model.ListBudget = budgetList;
+                // model.TotalRecords = await query.CountAsync();
+                // model.Response = SubResponseModel.GetResponseMsg("", true);
                 var budgetList = await _db.Tbl_Budgets.AsNoTracking()
-                    .Where(x => x.UserId == requestModel.CurrentUserId.ToString()).Select(x => new BudgetSetupDataModel
+                    .Where(x => x.UserId == requestModel.CurrentUserId)
+                    .Select(x => new BudgetSetupDataModel
                     {
                         BudgetId = x.BudgetId,
                         BudgetName = x.BudgetName,
@@ -36,11 +57,12 @@ public class BudgetSetupService
                         ToDate = x.ToDate,
                         LimitAmount = x.LimitAmount,
                     }).ToListAsync();
-                // pageSetting.TotalRowCount = lst.Count;
-                //        model.PageSetting = pageSetting;
-                //        model.SubjectList = lst.Skip(reqModel.PageSetting.SkipRowCount)
-                //            .Take(reqModel.PageSetting.PageSize).ToList();
-                model.ListBudget = budgetList;
+                pageSetting.TotalRowCount = budgetList.Count;
+                model.PageSetting = pageSetting;
+                model.ListBudget = budgetList
+                    .Skip(requestModel.PageSetting.SkipRowCount)
+                    .Take(requestModel.PageSetting.PageSize).ToList();
+               // model.ListBudget = budgetList;
                 model.Response = SubResponseModel.GetResponseMsg("", true);
             }
         }
@@ -117,6 +139,7 @@ public class BudgetSetupService
                 model.Response = SubResponseModel.GetResponseMsg("No Data Found!", false);
                 return model;
             }
+
             #region Check Category Code
 
             var category = await _db.Tbl_Categories.AsNoTracking()
@@ -194,7 +217,7 @@ public class BudgetSetupService
             dataModel.ToDate = item.ToDate;
             dataModel.CategoryName = item.CategoryName;
             dataModel.CategoryCode = item.CategoriesCode;
-            
+
 
             model.BudgetSetup = dataModel;
             model.Response = SubResponseModel.GetResponseMsg("", true);

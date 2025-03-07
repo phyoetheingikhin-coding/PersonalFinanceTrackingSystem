@@ -9,6 +9,9 @@ public class BudgetSetupResponseModel
     public List<CategoryDataModel>ListCategory { get; set; }
     public BudgetSetupDataModel BudgetSetup { get; set; }
     public ResponseModel Response { get; set; }
+    
+    public int TotalRecords { get; set; }
+    public PageSettingResponseModel PageSetting { get; set; }
 }
 
 public class CategoryDataModel

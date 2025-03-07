@@ -12,8 +12,12 @@ public partial class Page_BudgetSetup
     private UserSessionModel _userSession = new();
     private EnumFormType _formType = EnumFormType.List;
     private IEnumerable<CategoryDataModel> _lstCategory;
+    private PageSettingModel ps = new();
     bool visible = false;
+    private int count;
     private int value = 0;
+    private int _pageNumber = 1;
+    private int _pageSize = 10;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -28,21 +32,25 @@ public partial class Page_BudgetSetup
             }
 
             _userSession = await customAuthStateProvider.GetUserData();
-            await List();
+            await List(ps);
             //await GetCategoryList();
             StateHasChanged();
         }
     }
 
-    async Task List()
+    async Task List(PageSettingModel ps)
     {
         _request.CurrentUserId = _userSession.UserId;
+        _request.PageSetting = ps;
+        _request.PageNumber = _pageNumber;
+        _request.PageSize = _pageSize;
         _response = await _budgetSetupService.List(_request);
         if (!_response.Response.IsSuccess)
         {
             await _injectService.ErrorMessage(_response.Response.Message);
             return;
         }
+        count = _response.PageSetting.TotalPageNo;
         _formType = EnumFormType.List;
         StateHasChanged();
     }
@@ -68,7 +76,7 @@ public partial class Page_BudgetSetup
         }
 
         await _injectService.SuccessMessage(_response.Response.Message);
-        await List();
+        await List(ps);
     }
 
     private async Task Delete(string id)
@@ -85,7 +93,7 @@ public partial class Page_BudgetSetup
         }
 
         await _injectService.SuccessMessage(data.Response.Message);
-        await List();
+        await List(ps);
         StateHasChanged();
     }
 
@@ -134,7 +142,7 @@ public partial class Page_BudgetSetup
     {
         _request = new BudgetSetupRequestModel();
         visible = false;
-        await List();
+        await List(ps);
         _formType = EnumFormType.List;
         StateHasChanged();
     }
@@ -179,4 +187,24 @@ public partial class Page_BudgetSetup
 
         return true;
     }
+    
+    private async Task PageChanged(int i)
+    {
+        ps.PageNo = i;
+        await List(ps);
+    }
+
+    // private async Task NextPage()
+    // {
+    //     _pageNumber++;
+    //     await List();
+    // }
+    // private async Task PreviousPage()
+    // {
+    //     if (_pageNumber > 1)
+    //     {
+    //         _pageNumber--;
+    //         await List();
+    //     }
+    // }
 }

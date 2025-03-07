@@ -6,7 +6,7 @@
 @inject BudgetSetupService _budgetSetupService
 @rendermode RenderMode.InteractiveServer
 @using MudBlazor;
-@using Radzen.Blazor; 
+@using Radzen.Blazor;
 @using Variant = MudBlazor.Variant
 @if (_formType == EnumFormType.List)
 {
@@ -20,6 +20,7 @@
 
         @if (_response.ListBudget != null && _response.ListBudget.Count() > 0)
         {
+            int no = (ps.PageNo - 1) * ps.PageSize;
             <div style="width: 100%; overflow: auto; max-height: 400px;">
                 <MudTable Items="_response.ListBudget" Hover="true" Dense="true" Class="mt-3" Style="min-width: 100%;">
                     <HeaderContent>
@@ -32,7 +33,8 @@
                         <MudTh>Action</MudTh>
                     </HeaderContent>
                     <RowTemplate Context="item">
-                        <MudTd>@(_response.ListBudget.IndexOf(item) + 1)</MudTd>
+                        @* <MudTd>@(_response.ListBudget.IndexOf(item) + 1)</MudTd> *@
+                        <MudTd>@(++no)</MudTd>
                         <MudTd>@item.BudgetName</MudTd>
                         <MudTd>@item.CategoryName</MudTd>
                         <MudTd>@item.LimitAmount</MudTd>
@@ -47,6 +49,9 @@
                     </RowTemplate>
                 </MudTable>
             </div>
+            <div class="d-flex flex-column align-center mb-4">
+                <MudPagination BoundaryCount="2" MiddleCount="5" SelectedChanged="PageChanged" Count="@count" Class="mt-4" />
+            </div>
         }
         else
         {
@@ -54,6 +59,7 @@
         }
     </MudCard>
 }
+
 @if (_formType == EnumFormType.Create || _formType == EnumFormType.Edit)
 {
     <div class="card shadow-lg p-4 border-0 rounded-3">
@@ -66,8 +72,8 @@
                             <label class="form-label">Finance Type</label>
                             <RadzenRadioButtonList @bind-Value="@value" Change=@(args => OnFinanceTypeChanged(args)) TValue="int">
                                 <Items>
-                                    <RadzenRadioButtonListItem Text="Expense" Value="0" />
-                                    <RadzenRadioButtonListItem Text="Income" Value="1" />
+                                    <RadzenRadioButtonListItem Text="Expense" Value="0"/>
+                                    <RadzenRadioButtonListItem Text="Income" Value="1"/>
                                 </Items>
                             </RadzenRadioButtonList>
                         </div>
@@ -87,7 +93,7 @@
                                             Placeholder="Select" Data=@_lstCategory
                                             Value="@_request.CategoryCode"
                                             TextProperty="CategoryName" ValueProperty="CategoryCode"
-                                            Change=@(args => { if (args != null) _request.CategoryCode = args.ToString(); else _request.CategoryCode = null;}) />
+                                            Change=@(args => { if (args != null) _request.CategoryCode = args.ToString();else _request.CategoryCode = null; })/>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -129,3 +135,59 @@
         </div>
     </div>
 }
+
+@* @if (_formType == EnumFormType.List) *@
+@* { *@
+@* <MudCard> *@
+@*     <MudCardHeader> *@
+@*         <MudTypography Typo="Typo.h5"> *@
+@*             <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="Create">Create</MudButton> *@
+@*             Budget *@
+@*         </MudTypography> *@
+@*     </MudCardHeader> *@
+@* *@
+@*     @if (_response.ListBudget != null && _response.ListBudget.Count() > 0) *@
+@*     { *@
+@*     <div style="width: 100%; overflow: auto; max-height: 400px;"> *@
+@*         <MudTable Items="_response.ListBudget" Hover="true" Dense="true" Class="mt-3" Style="min-width: 100%;" RowsPerPage="10"> *@
+@*             <HeaderContent> *@
+@*                 <MudTh>Sr No.</MudTh> *@
+@*                 <MudTh>Budget Name</MudTh> *@
+@*                 <MudTh>Category Name</MudTh> *@
+@*                 <MudTh>Limit Amount</MudTh> *@
+@*                 <MudTh>From Date</MudTh> *@
+@*                 <MudTh>To Date</MudTh> *@
+@*                 <MudTh>Action</MudTh> *@
+@*             </HeaderContent> *@
+@*             <RowTemplate Context="item"> *@
+@*                 <MudTd>@(_response.ListBudget.IndexOf(item) + 1)</MudTd> *@
+@*                 <MudTd>@item.BudgetName</MudTd> *@
+@*                 <MudTd>@item.CategoryName</MudTd> *@
+@*                 <MudTd>@item.LimitAmount</MudTd> *@
+@*                 <MudTd>@item.FromDate</MudTd> *@
+@*                 <MudTd>@item.ToDate</MudTd> *@
+@*                 <MudTd> *@
+@*                     <div style="display: flex; gap: 8px;"> *@
+@*                         <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => Edit(item.BudgetId)">Edit</MudButton> *@
+@*                         <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="() => Delete(item.BudgetId)">Delete</MudButton> *@
+@*                     </div> *@
+@*                 </MudTd> *@
+@*             </RowTemplate> *@
+@*             <PagerContent> *@
+@*                 <MudTablePager PageSizeOptions="new int[] { 10, 25, 50 }" /> *@
+@*             </PagerContent> *@
+@*         </MudTable> *@
+@*     </div> *@
+@*     } *@
+@*     else *@
+@*     { *@
+@*     <MudTypography Class="ml-6" Typo="Typo.body1">No Record To Show</MudTypography> *@
+@*     } *@
+@* </MudCard> *@
+@* *@
+@* <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;"> *@
+@*     <MudButton OnClick="PreviousPage" Disabled="@(_pageNumber == 1)">Previous</MudButton> *@
+@*     <span>Page @_pageNumber</span> *@
+@*     <MudButton OnClick="NextPage" Disabled="@(_response.ListBudget?.Count < _pageSize)">Next</MudButton> *@
+@* </div> *@
+@* } *@
