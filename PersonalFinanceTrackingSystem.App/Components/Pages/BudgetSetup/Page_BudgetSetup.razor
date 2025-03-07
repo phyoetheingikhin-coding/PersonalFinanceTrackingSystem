@@ -78,10 +78,10 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Category Name</label>
-                            <select @bind="_request.CategoryName" class="form-select">
+                            <select @bind="_request.CategoryCode" class="form-select">
                                 @foreach (var item in _lstCategory)
                                 {
-                                    <option value="@item.CategoryName">@item.CategoryName</option>
+                                    <option value="@item.CategoryCode">@item.CategoryName</option>
                                 }
                             </select>
                         </div>

@@ -69,10 +69,22 @@ public class BudgetSetupService
 
             #endregion
 
+            #region Check Category Code
+
+            var category = await _db.Tbl_Categories.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CategoriesCode == requestModel.CategoryCode);
+            if (category is null)
+            {
+                model.Response = SubResponseModel.GetResponseMsg("Category does not exist!", false);
+                return model;
+            }
+
+            #endregion
+
             Tbl_Budget budget = new Tbl_Budget();
             budget.BudgetId = Guid.NewGuid().ToString();
             budget.BudgetName = requestModel.BudgetName;
-            budget.CategoryName = requestModel.CategoryName;
+            budget.CategoryName = category.Name;
             budget.FromDate = requestModel.FromDate;
             budget.ToDate = requestModel.ToDate;
             budget.LimitAmount = requestModel.LimitAmount;

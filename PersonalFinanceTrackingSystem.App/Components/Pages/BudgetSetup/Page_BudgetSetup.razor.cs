@@ -142,7 +142,7 @@ public partial class Page_BudgetSetup
 
     async Task<bool> CheckRequiredFields(BudgetSetupRequestModel _request)
     {
-        if (_request.CategoryName.IsNullOrEmpty())
+        if (_request.CategoryCode.IsNullOrEmpty())
         {
             await _injectService.ErrorMessage("CategoryName Field is Required.");
             return false;
