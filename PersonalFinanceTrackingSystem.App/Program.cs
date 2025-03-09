@@ -1,5 +1,4 @@
 using PersonalFinanceTrackingSystem.App.Components;
-using System;
 using Microsoft.EntityFrameworkCore;
 using PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
 using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Login;
@@ -9,7 +8,7 @@ using PersonalFinanceTrackingSystem.App.Service;
 using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 using PersonalFinanceTrackingSystem.App.Service.Security;
 using MudBlazor.Services;
-using Radzen;
+using PersonalFinanceTrackingSystem.Shared.DapperService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +27,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 },
 ServiceLifetime.Transient,
 ServiceLifetime.Transient);
+builder.Services.AddScoped<DapperService>(x => new DapperService(connectionString));
 
 #endregion
 

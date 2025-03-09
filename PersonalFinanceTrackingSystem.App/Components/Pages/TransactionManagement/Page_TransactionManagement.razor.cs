@@ -1,4 +1,5 @@
 using Microsoft.IdentityModel.Tokens;
+using MudBlazor;
 using PersonalFinanceTrackingSystem.App.Service.Security;
 using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 
@@ -13,6 +14,7 @@ public partial class Page_TransactionManagement
     private EnumFormType _formType = EnumFormType.List;
     private IEnumerable<CategoryDataModel> _lstCategory;
     private bool visible = false;
+    private int value = 0;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -27,6 +29,7 @@ public partial class Page_TransactionManagement
             }
             
             _userSession = await customAuthStateProvider.GetUserData();
+            await List();
             StateHasChanged();
         }
     }
@@ -40,7 +43,7 @@ public partial class Page_TransactionManagement
             await _injectService.ErrorMessage(_response.Response.Message);
             return;
         }
-
+        _formType = EnumFormType.List;
         StateHasChanged();
     }
     
@@ -57,13 +60,11 @@ public partial class Page_TransactionManagement
         {
             _response = await _TransactionTracking.Create(_request);
         }
-
         if (!_response.Response.IsSuccess)
         {
             await _injectService.ErrorMessage(_response.Response.Message);
             return;
         }
-
         await _injectService.SuccessMessage(_response.Response.Message);
         await List();
     }
@@ -89,10 +90,9 @@ public partial class Page_TransactionManagement
     {
         try
         {
+            _request.FinanceType = "Expense";
             await GetCategoryList();
-            var item = _lstCategory;
             _formType = EnumFormType.Create;
-            _request = new TrackTransactionRequestModel();
             StateHasChanged();
         }
         catch (Exception ex)
@@ -130,36 +130,34 @@ public partial class Page_TransactionManagement
     
     async Task<bool> CheckRequiredFields(TrackTransactionRequestModel _request)
     {
-        if (_request.CategoryName.IsNullOrEmpty())
+        if (_request.CategoryCode.IsNullOrEmpty())
         {
             await _injectService.ErrorMessage("CategoryName Field is Required.");
             return false;
         }
+        // if (_request.CategoryName.IsNullOrEmpty())
+        // {
+        //     await _injectService.ErrorMessage("CategoryName Field is Required.");
+        //     return false;
+        // }
 
-        if (_request.CategoryName == null)
+        if (_request.Amount <= 0 )
         {
             await _injectService.ErrorMessage("");
             return false;
         }
 
-        if (_request.CategoryName == null)
+        if (_request.Description.IsNullOrEmpty())
         {
             await _injectService.ErrorMessage("");
             return false;
         }
 
-        if (_request.Description == null)
+        if (_request.FinanceType.IsNullOrEmpty())
         {
             await _injectService.ErrorMessage("");
             return false;
         }
-
-        if (_request.Amount == null)
-        {
-            await _injectService.ErrorMessage("");
-            return false;
-        }
-
         return true;
     }
     
@@ -167,5 +165,10 @@ public partial class Page_TransactionManagement
     {
         var result = await _TransactionTracking.GetCategoryList(_request.FinanceType);
         _lstCategory = result.ListCategory;
+    }
+    private async Task OnFinanceTypeChanged(int value)
+    {
+        _request.FinanceType = value == 0 ? "Expense" : "Income";
+        await GetCategoryList();
     }
 }

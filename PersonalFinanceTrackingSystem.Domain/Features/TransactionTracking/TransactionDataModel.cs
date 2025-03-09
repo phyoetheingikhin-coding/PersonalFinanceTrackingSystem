@@ -10,7 +10,6 @@ public class TransactionDataModel
 
     public DateTime? TranDate { get; set; }
     public string FinanceType { get; set; }
-    
-public string TransactionId { get; set; }
+    public string TransactionId { get; set; }
     public string Descriptions { get; set; } = null!;
 }

@@ -1,4 +1,121 @@
 @page "/transaction"
 @inject TransactionTrackingService _TransactionTracking
 @rendermode RenderMode.InteractiveServer
+@using MudBlazor;
+@using Variant = MudBlazor.Variant
 @layout MainLayout
+@if (_formType == EnumFormType.List)
+{
+    <MudCard>
+        <MudCardHeader>
+            <MudTypography Typo="Typo.h5">
+                <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="Create">Create</MudButton>
+                Transaction
+            </MudTypography>
+        </MudCardHeader>
+
+        @if (_response.TransactionList != null && _response.TransactionList.Count() > 0)
+        {
+            // int no = (ps.PageNo - 1) * ps.PageSize;
+            <div style="width: 100%; overflow: auto; max-height: 400px;">
+                <MudTable Items="_response.TransactionList" Hover="true" Dense="true" Class="mt-3" Style="min-width: 100%;">
+                    <HeaderContent>
+                        <MudTh>Sr No.</MudTh>
+                        <MudTh>Category Name</MudTh>
+                        <MudTh>Descriptions</MudTh>
+                        <MudTh>Finance Type</MudTh>
+                        <MudTh>Amount</MudTh>
+                        <MudTh>TranDate</MudTh>
+                    </HeaderContent>
+                    <RowTemplate Context="item">
+                        <MudTd>@(_response.TransactionList.IndexOf(item) + 1)</MudTd>
+                        @* <MudTd>@(++no)</MudTd> *@
+                        <MudTd>@item.CategoryName</MudTd>
+                        <MudTd>@item.Descriptions</MudTd>
+                        <MudTd>@item.FinanceType</MudTd>
+                        <MudTd>@item.Amount</MudTd>
+                        <MudTd>@item.TranDate</MudTd>
+                        <MudTd>
+                            <div style="display: flex; gap: 8px;">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => Edit(item.TransactionId)">Edit</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="() => Delete(item.TransactionId)">Delete</MudButton>
+                            </div>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </div>
+            @* <div class="d-flex flex-column align-center mb-4"> *@
+            @*     <MudPagination BoundaryCount="2" MiddleCount="5" SelectedChanged="PageChanged" Count="@count" Class="mt-4" /> *@
+            @* </div> *@
+        }
+        else
+        {
+            <MudTypography Class="ml-6" Typo="Typo.body1">No Record To Show</MudTypography>
+        }
+    </MudCard>
+}
+
+@if (_formType == EnumFormType.Create || _formType == EnumFormType.Edit)
+{
+    <div class="card shadow-lg p-4 border-0 rounded-3">
+        <div class="card-body">
+            <h4 class="text-primary fw-bold mb-4">@(_formType.ToString()) Transaction</h4>
+            <RadzenTemplateForm TItem="TrackTransactionRequestModel" Data=@_request Submit="@Save">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Finance Type</label>
+                            <RadzenRadioButtonList @bind-Value="@value" Change=@(args => OnFinanceTypeChanged(args)) TValue="int">
+                                <Items>
+                                    <RadzenRadioButtonListItem Text="Expense" Value="0"/>
+                                    <RadzenRadioButtonListItem Text="Income" Value="1"/>
+                                </Items>
+                            </RadzenRadioButtonList>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="exampleFormControlInput1" class="form-label">Category Name</label>
+                            <RadzenDropDown AllowClear="true" TValue="string"
+                                            FilterCaseSensitivity="Radzen.FilterCaseSensitivity.CaseInsensitive"
+                                            AllowFiltering="true" Class="w-100" Disabled="@visible"
+                                            Placeholder="Select" Data=@_lstCategory
+                                            Value="@_request.CategoryCode"
+                                            TextProperty="CategoryName" ValueProperty="CategoryCode"
+                                            Change=@(args => { if (args != null) _request.CategoryCode = args.ToString();else _request.CategoryCode = null; })/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label"> Amount</label>
+                            <input type="number" class="form-control" disabled=@visible @bind-value="_request.Amount">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-control" disabled=@visible @bind-value="_request.Description">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="limitDate" class="form-label">Transaction Date</label>
+                            <InputDate id="limitDate" class="form-control"
+                                       @bind-Value="_request.TranDate"
+                                       disabled="@visible"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mt-7">
+                            <label for="limitDate" class="form-label"></label>
+                            <button type="button" class="btn btn-secondary me-2" @onclick="Cancel">Cancel</button>
+                            <button class="btn btn-success btn-sm mb-0" type="submit">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </RadzenTemplateForm>
+
+        </div>
+    </div>
+}

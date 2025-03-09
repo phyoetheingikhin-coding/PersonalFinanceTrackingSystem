@@ -3,16 +3,19 @@ using Microsoft.IdentityModel.Tokens;
 using PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
 using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 using PersonalFinanceTrackingSystem.Shared.Common;
+using PersonalFinanceTrackingSystem.Shared.DapperService;
 
 namespace PersonalFinanceTrackingSystem.Domain.Features.TransactionTracking;
 
 public class TransactionTrackingService
 {
     private readonly AppDbContext _db;
+    private readonly DapperService _dapper;
 
-    public TransactionTrackingService(AppDbContext db)
+    public TransactionTrackingService(AppDbContext db, DapperService dapper)
     {
         _db = db;
+        _dapper = dapper;
     }
 
     public async Task<TrackTransactionResponseModel> List(TrackTransactionRequestModel request)
@@ -20,6 +23,8 @@ public class TransactionTrackingService
         TrackTransactionResponseModel model = new TrackTransactionResponseModel();
         try
         {
+            #region Check User
+
             var user = await _db.Tbl_Users.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == request.CurrentUserId);
             if (user is null)
@@ -28,19 +33,52 @@ public class TransactionTrackingService
                 return model;
             }
 
-            var transaction = await _db.Tbl_Transactions.AsNoTracking()
-                .Where(x => x.UserId == user.UserId)
-                .Select(x => new TransactionDataModel()
-                {
-                    TranDate = x.CreatedDate,
-                    Amount = x.Amount,
-                    UserName = user.UserName,
-                    FinanceType = x.TransactionType,
-                    //Description = x.Note,
-                    //CategoryName = x.CategoriesName
-                })
-                .ToListAsync();
-            model.TransactionList = transaction;
+            #endregion
+            
+            // #region Check Category
+            //
+            // var category = await _db.Tbl_Categories.AsNoTracking()
+            //     .FirstOrDefaultAsync(x => x.CategoriesCode == request.CategoryCode);
+            // if (category is null)
+            // {
+            //     model.Response = SubResponseModel.GetResponseMsg("Category does not exist!", false);
+            //     return model;
+            // }
+            //
+            // #endregion
+            
+            string query = @" SELECT 
+     t.TransactionId,
+    t.CreatedDate AS TranDate,
+    t.Amount,
+    t.TransactionType AS FinanceType,
+    t.Descriptions,
+    c.Name AS CategoryName 
+FROM 
+    Tbl_Transactions t 
+INNER JOIN 
+    Tbl_Categories c 
+ON 
+    t.CategoriesCode = c.CategoriesCode
+WHERE 
+    t.UserId = @CurrentUserId";
+            var result = _dapper.Query<TransactionDataModel>(query, request);
+            //var transaction = result.ToList();
+
+            // var transaction = await _db.Tbl_Transactions.AsNoTracking()
+            //     .Where(x => x.UserId == user.UserId)
+            //     .Select(x => new TransactionDataModel()
+            //     {
+            //         TranDate = x.CreatedDate,
+            //         Amount = x.Amount,
+            //         UserName = user.UserName,
+            //         FinanceType = x.TransactionType,
+            //         //Description = x.Note,
+            //         //CategoryName = x.CategoriesName
+            //     })
+            //     .ToListAsync();
+            //model.TransactionList = transaction;
+            model.TransactionList = result;
             model.Response = SubResponseModel.GetResponseMsg("Success", true);
         }
         catch (Exception ex)
@@ -130,6 +168,7 @@ public class TransactionTrackingService
                 model.Response = SubResponseModel.GetResponseMsg("No Data Found", false);
                 return model;
             }
+
             //item.DelFlag = true;
             //_db.Entry(item).State = EntityState.Modified;
             _db.Remove(item);
@@ -161,10 +200,29 @@ public class TransactionTrackingService
 
             #endregion
 
+            #region Check Category
+
+            var category = await _db.Tbl_Categories.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CategoriesCode == request.CategoryCode);
+            if (category is null)
+            {
+                model.Response = SubResponseModel.GetResponseMsg("Category does not exist!", false);
+                return model;
+            }
+
+            #endregion
+
             Tbl_Transaction item = new Tbl_Transaction()
             {
-                TransactionId = Guid.NewGuid().ToString(),
                 //TransactionId = Ulid.NewUlid().ToString(),
+                TransactionId = Guid.NewGuid().ToString(),
+                CategoriesCode = category.CategoriesCode,
+                Descriptions = request.Description,
+                UserId = request.CurrentUserId,
+                Amount = request.Amount,
+                CreatedDate = request.TranDate,
+                TransactionType = request.FinanceType
+                // FinanceType = request.FinanceType
             };
             await _db.AddAsync(item);
             await _db.SaveChangesAsync();
@@ -206,7 +264,7 @@ public class TransactionTrackingService
     public void AddTransaction(TransactionDataModel dataModel)
     {
     }
-    
+
     public async Task<TrackTransactionResponseModel> GetCategoryList(string financeType)
     {
         TrackTransactionResponseModel model = new TrackTransactionResponseModel();
