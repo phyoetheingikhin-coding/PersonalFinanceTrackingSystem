@@ -1,3 +1,57 @@
 ﻿.rz-radio-button-list-horizontal.valid.modified{
     outline: none !important; 
 }
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    padding: 20px;
+}
+.wallet-container {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.section {
+    margin-bottom: 20px;
+}
+.section h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+.section p {
+    color: #666;
+    margin: 5px 0;
+}
+.progress-bar {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+.progress {
+    background-color: #76c7c0;
+    height: 10px;
+}
+.status {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+.status span {
+    font-size: 14px;
+}
+.button {
+    background-color: #76c7c0;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    display: inline-block;
+    margin-top: 20px;
+}
+.button:hover {
+    background-color: #65b0a9;
+}

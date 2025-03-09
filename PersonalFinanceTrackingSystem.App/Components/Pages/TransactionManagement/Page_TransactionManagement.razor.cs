@@ -73,7 +73,7 @@ public partial class Page_TransactionManagement
     {
         _request.TransactionId = id;
         var data = await _TransactionTracking.Edit(id);
-        if (!data.Response.IsSuccess)
+        if (!data.Response.IsSuccess || data.TransactionData == null)
         {
             await _injectService.ErrorMessage(data.Response.Message);
             return;
@@ -81,9 +81,9 @@ public partial class Page_TransactionManagement
 
         _request.CategoryName = data.TransactionData.CategoryName;
         _request.Amount = (decimal)data.TransactionData.Amount!;
-        _request.FinanceType = data.TransactionData.FinanceType!;
-        _request.Description = data.TransactionData.Descriptions!;
-        // _request.TranDate = data.TransactionData.TranDate;
+        _request.FinanceType = data.TransactionData.FinanceType;
+        _request.Description = data.TransactionData.Descriptions;
+        _request.TranDate = (DateTime)data.TransactionData.TranDate!;
         _formType = EnumFormType.Edit;
     }
     private async Task Create()

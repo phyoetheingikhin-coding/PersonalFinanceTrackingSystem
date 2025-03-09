@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PersonalFinanceTrackingSystem.Database.EfAppDbContextModels;
 using PersonalFinanceTrackingSystem.Shared.Common;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
@@ -9,10 +10,12 @@ namespace PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 public class BudgetSetupService
 {
     private readonly AppDbContext _db;
+    private readonly ILogger<BudgetSetupService> _logger;
 
-    public BudgetSetupService(AppDbContext db)
+    public BudgetSetupService(AppDbContext db, ILogger<BudgetSetupService> logger)
     {
         _db = db;
+        _logger = logger;
     }
 
     public async Task<BudgetSetupResponseModel> List(BudgetSetupRequestModel requestModel)
@@ -68,6 +71,7 @@ public class BudgetSetupService
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.ToString());
             model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
         }
 
@@ -120,6 +124,7 @@ public class BudgetSetupService
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.ToString());
             model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
         }
 
@@ -163,6 +168,7 @@ public class BudgetSetupService
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.ToString());
             model.Response = SubResponseModel.GetResponseMsg($"{ex.Message}", false);
         }
 
@@ -191,6 +197,7 @@ public class BudgetSetupService
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.ToString());
             model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
         }
 
@@ -224,6 +231,7 @@ public class BudgetSetupService
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.ToString());
             model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
         }
 
@@ -251,6 +259,7 @@ public class BudgetSetupService
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex.ToString());
             model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
         }
 

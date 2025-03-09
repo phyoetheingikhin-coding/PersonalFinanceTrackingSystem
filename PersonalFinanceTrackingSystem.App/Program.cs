@@ -9,8 +9,17 @@ using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 using PersonalFinanceTrackingSystem.App.Service.Security;
 using MudBlazor.Services;
 using PersonalFinanceTrackingSystem.Shared.DapperService;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load Serilog configuration from appsettings.json
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+// Add Serilog to logging
+builder.Host.UseSerilog();
 
 builder.Services.AddMudServices();
 
@@ -42,6 +51,9 @@ builder.Services.AddScoped<TransactionTrackingService>();
 
 
 var app = builder.Build();
+
+// Middleware to log requests
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

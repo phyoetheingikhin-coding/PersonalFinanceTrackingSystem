@@ -35,17 +35,7 @@ public class TransactionTrackingService
 
             #endregion
             
-            // #region Check Category
-            //
-            // var category = await _db.Tbl_Categories.AsNoTracking()
-            //     .FirstOrDefaultAsync(x => x.CategoriesCode == request.CategoryCode);
-            // if (category is null)
-            // {
-            //     model.Response = SubResponseModel.GetResponseMsg("Category does not exist!", false);
-            //     return model;
-            // }
-            //
-            // #endregion
+           
             
             string query = @" SELECT 
      t.TransactionId,
@@ -136,8 +126,20 @@ WHERE
                 model.Response = SubResponseModel.GetResponseMsg("No Data Found!", false);
                 return model;
             }
-
-            dataModel.CategoryName = item.CategoriesCode;
+            
+            #region Check Category
+            
+            var category = await _db.Tbl_Categories.AsNoTracking()
+                .FirstOrDefaultAsync(x => x.CategoriesCode == item.CategoriesCode);
+            if (category is null)
+            {
+                model.Response = SubResponseModel.GetResponseMsg("Category does not exist!", false);
+                return model;
+            }
+            
+            #endregion
+            
+            dataModel.CategoryName = category.Name;
             dataModel.Amount = item.Amount;
             dataModel.Descriptions = item.Descriptions;
             dataModel.TranDate = item.CreatedDate;
