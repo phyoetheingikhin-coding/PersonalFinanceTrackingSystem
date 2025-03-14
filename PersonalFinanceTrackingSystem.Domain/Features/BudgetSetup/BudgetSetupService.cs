@@ -4,21 +4,22 @@ using PersonalFinanceTrackingSystem.Shared.Common;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using PersonalFinanceTrackingSystem.Shared.DapperService;
 
 namespace PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 
 public class BudgetSetupService
 {
     private readonly AppDbContext _db;
-    private readonly ILogger<BudgetSetupService> _logger;
+    private readonly DapperService _dapper;
 
-    public BudgetSetupService(AppDbContext db, ILogger<BudgetSetupService> logger)
+    public BudgetSetupService(AppDbContext db, DapperService dapper)
     {
         _db = db;
-        _logger = logger;
+        _dapper = dapper;
     }
 
-    public async Task<BudgetSetupResponseModel> List(BudgetSetupRequestModel requestModel)
+    public async Task<Result<BudgetSetupResponseModel>> List(BudgetSetupRequestModel requestModel)
     {
         BudgetSetupResponseModel model = new BudgetSetupResponseModel();
         PageSettingResponseModel pageSetting = new();
@@ -48,6 +49,7 @@ public class BudgetSetupService
                 // model.ListBudget = budgetList;
                 // model.TotalRecords = await query.CountAsync();
                 // model.Response = SubResponseModel.GetResponseMsg("", true);
+
                 var budgetList = await _db.Tbl_Budgets.AsNoTracking()
                     .Where(x => x.UserId == requestModel.CurrentUserId)
                     .Select(x => new BudgetSetupDataModel
@@ -65,20 +67,47 @@ public class BudgetSetupService
                 model.ListBudget = budgetList
                     .Skip(requestModel.PageSetting.SkipRowCount)
                     .Take(requestModel.PageSetting.PageSize).ToList();
-               // model.ListBudget = budgetList;
-                model.Response = SubResponseModel.GetResponseMsg("", true);
+                model.ListBudget = budgetList;
+
+//                 var query = @"SELECT  
+//     b.BudgetName,
+//     b.LimitAmount, 
+//     b.FromDate,
+//     b.ToDate,
+//     SUM(CASE 
+//         WHEN t.TransactionType = 'Expense' THEN t.Amount  
+//         WHEN t.TransactionType = 'Income' THEN -t.Amount  
+//         ELSE 0 
+//     END) AS NewUsedAmount
+// FROM 
+//     Tbl_Transactions t 
+// INNER JOIN 
+//     Tbl_Budgets b ON b.CategoriesCode = t.CategoriesCode
+// INNER JOIN 
+//     Tbl_Categories cat ON cat.CategoriesCode = t.CategoriesCode
+// WHERE 
+//     b.UserId = @CurrentUserId 
+//     AND t.UserId = @CurrentUserId
+//     AND CONVERT(DATE, t.CreatedDate) BETWEEN CONVERT(DATE, b.FromDate) AND CONVERT(DATE, b.ToDate)
+// GROUP BY 
+//     b.BudgetName, b.LimitAmount, b.FromDate, b.ToDate";
+//                 var result = _dapper.Query<BudgetSetupDataModel>(query, requestModel);
+//                 pageSetting.TotalRowCount = result.Count;
+//                 model.PageSetting = pageSetting;
+//                 model.ListBudget = result
+//                     .Skip(requestModel.PageSetting.SkipRowCount)
+//                     .Take(requestModel.PageSetting.PageSize).ToList();
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.ToString());
-            model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
+            return Result<BudgetSetupResponseModel>.FailureResult("Fail!");
         }
 
-        return model;
+        return Result<BudgetSetupResponseModel>.SuccessResult(model, "Successful");
     }
 
-    public async Task<BudgetSetupResponseModel> Create(BudgetSetupRequestModel requestModel)
+    public async Task<Result<BudgetSetupResponseModel>> Create(BudgetSetupRequestModel requestModel)
     {
         BudgetSetupResponseModel model = new BudgetSetupResponseModel();
         try
@@ -89,8 +118,7 @@ public class BudgetSetupService
                 .FirstOrDefaultAsync(x => x.UserId == requestModel.CurrentUserId.ToString());
             if (user is null)
             {
-                model.Response = SubResponseModel.GetResponseMsg("User does not exist!", false);
-                return model;
+                return Result<BudgetSetupResponseModel>.FailureResult("User does not exist!");
             }
 
             #endregion
@@ -101,8 +129,7 @@ public class BudgetSetupService
                 .FirstOrDefaultAsync(x => x.CategoriesCode == requestModel.CategoryCode);
             if (category is null)
             {
-                model.Response = SubResponseModel.GetResponseMsg("Category does not exist!", false);
-                return model;
+                return Result<BudgetSetupResponseModel>.FailureResult("Category does not exist!");
             }
 
             #endregion
@@ -120,18 +147,16 @@ public class BudgetSetupService
 
             await _db.AddAsync(budget);
             await _db.SaveChangesAsync();
-            model.Response = SubResponseModel.GetResponseMsg("Budget Setup Successful", true);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.ToString());
-            model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
+            return Result<BudgetSetupResponseModel>.SuccessResult(model, "Budget Setup Failed");
         }
 
-        return model;
+        return Result<BudgetSetupResponseModel>.SuccessResult(model, "Budget Setup Successful");
     }
 
-    public async Task<BudgetSetupResponseModel> Update(BudgetSetupRequestModel requestModel)
+    public async Task<Result<BudgetSetupResponseModel>> Update(BudgetSetupRequestModel requestModel)
     {
         BudgetSetupResponseModel model = new BudgetSetupResponseModel();
         try
@@ -141,8 +166,7 @@ public class BudgetSetupService
                 x.UserId == requestModel.CurrentUserId.ToString());
             if (item == null)
             {
-                model.Response = SubResponseModel.GetResponseMsg("No Data Found!", false);
-                return model;
+                return Result<BudgetSetupResponseModel>.FailureResult("No Data Found!");
             }
 
             #region Check Category Code
@@ -151,8 +175,7 @@ public class BudgetSetupService
                 .FirstOrDefaultAsync(x => x.CategoriesCode == requestModel.CategoryCode);
             if (category is null)
             {
-                model.Response = SubResponseModel.GetResponseMsg("Category does not exist!", false);
-                return model;
+                return Result<BudgetSetupResponseModel>.FailureResult("Category does not exist!");
             }
 
             #endregion
@@ -164,18 +187,16 @@ public class BudgetSetupService
             item.ToDate = requestModel.ToDate;
             _db.Entry(item).State = EntityState.Modified;
             await _db.SaveChangesAsync();
-            model.Response = SubResponseModel.GetResponseMsg("Updated Successful!", true);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.ToString());
-            model.Response = SubResponseModel.GetResponseMsg($"{ex.Message}", false);
+            return Result<BudgetSetupResponseModel>.FailureResult($"{ex.Message}");
         }
 
-        return model;
+        return Result<BudgetSetupResponseModel>.SuccessResult(model, "Updated Successful!");
     }
 
-    public async Task<BudgetSetupResponseModel> Delete(BudgetSetupRequestModel requestModel)
+    public async Task<Result<BudgetSetupResponseModel>> Delete(BudgetSetupRequestModel requestModel)
     {
         BudgetSetupResponseModel model = new BudgetSetupResponseModel();
         try
@@ -185,8 +206,7 @@ public class BudgetSetupService
                 x.UserId == requestModel.CurrentUserId.ToString());
             if (item == null)
             {
-                model.Response = SubResponseModel.GetResponseMsg("No Data Found!", false);
-                return model;
+                return Result<BudgetSetupResponseModel>.FailureResult("No Data Found!");
             }
 
             //item.DelFlag = true;
@@ -197,14 +217,13 @@ public class BudgetSetupService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.ToString());
-            model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
+            return Result<BudgetSetupResponseModel>.FailureResult($"{ex.Message}");
         }
 
-        return model;
+        return Result<BudgetSetupResponseModel>.SuccessResult("Deleted Successful");
     }
 
-    public async Task<BudgetSetupResponseModel> Edit(string budgetId)
+    public async Task<Result<BudgetSetupResponseModel>> Edit(string budgetId)
     {
         BudgetSetupResponseModel model = new BudgetSetupResponseModel();
         BudgetSetupDataModel dataModel = new BudgetSetupDataModel();
@@ -214,8 +233,7 @@ public class BudgetSetupService
                 .FirstOrDefaultAsync(x => x.BudgetId == budgetId);
             if (item == null)
             {
-                model.Response = SubResponseModel.GetResponseMsg("No Data Found!", false);
-                return model;
+                return Result<BudgetSetupResponseModel>.FailureResult("No Data Found!");
             }
 
             dataModel.BudgetName = item.BudgetName;
@@ -224,21 +242,17 @@ public class BudgetSetupService
             dataModel.ToDate = item.ToDate;
             dataModel.CategoryName = item.CategoryName;
             dataModel.CategoryCode = item.CategoriesCode;
-
-
             model.BudgetSetup = dataModel;
-            model.Response = SubResponseModel.GetResponseMsg("", true);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.ToString());
-            model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
+            return Result<BudgetSetupResponseModel>.FailureResult($"{ex.Message}");
         }
 
-        return model;
+        return Result<BudgetSetupResponseModel>.SuccessResult(model, "Successful");
     }
 
-    public async Task<BudgetSetupResponseModel> GetCategoryList(string financeType)
+    public async Task<Result<BudgetSetupResponseModel>> GetCategoryList(string financeType)
     {
         BudgetSetupResponseModel model = new BudgetSetupResponseModel();
         CategoryDataModel catData = new CategoryDataModel();
@@ -254,15 +268,13 @@ public class BudgetSetupService
             if (!item.IsNullOrEmpty())
             {
                 model.ListCategory = item;
-                model.Response = SubResponseModel.GetResponseMsg("", true);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.ToString());
-            model.Response = SubResponseModel.GetResponseMsg(ex.ToString(), false);
+            return Result<BudgetSetupResponseModel>.FailureResult($"{ex.Message}");
         }
 
-        return model;
+        return Result<BudgetSetupResponseModel>.SuccessResult(model,"Successful");
     }
 }

@@ -36,55 +36,76 @@ public partial class Page_TransactionManagement
 
     async Task List()
     {
-        _request.CurrentUserId = _userSession.UserId;
-        _response = await _TransactionTracking.List(_request);
-        if (!_response.Response.IsSuccess)
+        try
         {
-            await _injectService.ErrorMessage(_response.Response.Message);
-            return;
+            _request.CurrentUserId = _userSession.UserId;
+            _response = await _TransactionTracking.List(_request);
+            if (!_response.Response.IsSuccess)
+            {
+                await _injectService.ErrorMessage(_response.Response.Message);
+                return;
+            }
+            _formType = EnumFormType.List;
+            StateHasChanged();
         }
-        _formType = EnumFormType.List;
-        StateHasChanged();
+        catch (Exception ex)
+        {
+           _logger.LogError(ex.ToString());
+        }
     }
     
     async Task Save()
     {
-        if (!await CheckRequiredFields(_request)) return;
+        try
+        {
+            if (!await CheckRequiredFields(_request)) return;
 
-        _request.CurrentUserId = _userSession.UserId;
-        if (!_request.TransactionId.IsNullOrEmpty())
-        {
-            _response = await _TransactionTracking.Update(_request);
+            _request.CurrentUserId = _userSession.UserId;
+            if (!_request.TransactionId.IsNullOrEmpty())
+            {
+                _response = await _TransactionTracking.Update(_request);
+            }
+            else
+            {
+                _response = await _TransactionTracking.Create(_request);
+            }
+            if (!_response.Response.IsSuccess)
+            {
+                await _injectService.ErrorMessage(_response.Response.Message);
+                return;
+            }
+            await _injectService.SuccessMessage(_response.Response.Message);
+            await List();
         }
-        else
+        catch (Exception ex)
         {
-            _response = await _TransactionTracking.Create(_request);
+            _logger.LogError(ex.ToString());
         }
-        if (!_response.Response.IsSuccess)
-        {
-            await _injectService.ErrorMessage(_response.Response.Message);
-            return;
-        }
-        await _injectService.SuccessMessage(_response.Response.Message);
-        await List();
     }
 
     async Task Edit(string id)
     {
-        _request.TransactionId = id;
-        var data = await _TransactionTracking.Edit(id);
-        if (!data.Response.IsSuccess || data.TransactionData == null)
+        try
         {
-            await _injectService.ErrorMessage(data.Response.Message);
-            return;
-        }
+            _request.TransactionId = id;
+            var data = await _TransactionTracking.Edit(id);
+            if (!data.Response.IsSuccess || data.TransactionData == null)
+            {
+                await _injectService.ErrorMessage(data.Response.Message);
+                return;
+            }
 
-        _request.CategoryName = data.TransactionData.CategoryName;
-        _request.Amount = (decimal)data.TransactionData.Amount!;
-        _request.FinanceType = data.TransactionData.FinanceType;
-        _request.Description = data.TransactionData.Descriptions;
-        _request.TranDate = (DateTime)data.TransactionData.TranDate!;
-        _formType = EnumFormType.Edit;
+            _request.CategoryName = data.TransactionData.CategoryName;
+            _request.Amount = (decimal)data.TransactionData.Amount!;
+            _request.FinanceType = data.TransactionData.FinanceType;
+            _request.Description = data.TransactionData.Descriptions;
+            _request.TranDate = (DateTime)data.TransactionData.TranDate!;
+            _formType = EnumFormType.Edit;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+        }
     }
     private async Task Create()
     {
@@ -97,26 +118,33 @@ public partial class Page_TransactionManagement
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
+           _logger.LogError(ex.ToString());
         }
     }
     
     private async Task Delete(string id)
     {
-        bool isConfirm = await _injectService.ConfirmMessageBox("Are you sure you want to delete");
-        if (!isConfirm) return;
-        _request.CurrentUserId = _userSession.UserId;
-        _request.TransactionId = id;
-        var data = await _TransactionTracking.Delete(_request);
-        if (!data.Response.IsSuccess)
+        try
         {
-            await _injectService.ErrorMessage(data.Response.Message);
-            return;
-        }
+            bool isConfirm = await _injectService.ConfirmMessageBox("Are you sure you want to delete");
+            if (!isConfirm) return;
+            _request.CurrentUserId = _userSession.UserId;
+            _request.TransactionId = id;
+            var data = await _TransactionTracking.Delete(_request);
+            if (!data.Response.IsSuccess)
+            {
+                await _injectService.ErrorMessage(data.Response.Message);
+                return;
+            }
 
-        await _injectService.SuccessMessage(data.Response.Message);
-        await List();
-        StateHasChanged();
+            await _injectService.SuccessMessage(data.Response.Message);
+            await List();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+           _logger.LogError(ex.ToString());
+        }
     }
     
     async Task Cancel()
@@ -163,8 +191,15 @@ public partial class Page_TransactionManagement
     
     async Task GetCategoryList()
     {
-        var result = await _TransactionTracking.GetCategoryList(_request.FinanceType);
-        _lstCategory = result.ListCategory;
+        try
+        {
+            var result = await _TransactionTracking.GetCategoryList(_request.FinanceType);
+            _lstCategory = result.ListCategory;
+        }
+        catch (Exception ex)
+        {
+          _logger.LogError(ex.ToString());
+        }
     }
     private async Task OnFinanceTypeChanged(int value)
     {

@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using System.Security.Cryptography;
 using System.ComponentModel;
+// using Microsoft.Extensions.Logging;
+using System.Runtime.CompilerServices;
 
 namespace PersonalFinanceTrackingSystem.Shared;
 
@@ -50,4 +52,16 @@ public static partial class DevCode
             .GetCustomAttributes(typeof(DescriptionAttribute), false);
         return attributes.Length > 0 ? attributes[0].Description : string.Empty;
     }
+    
+    // public static void LogCustomError(this ILogger logger,
+    //     Exception ex,
+    //     [CallerFilePath] string filePath = "",
+    //     [CallerMemberName] string methodName = "",
+    //     [CallerLineNumber] int lineNo=0)
+    // {
+    //     var fileName = Path.GetFileName(filePath);
+    //     var message =
+    //         $"File Name - {fileName} | Method Name - {methodName} | Line Number - {lineNo} | Result - {ex}";
+    //     logger.LogError(message);
+    // }
 }

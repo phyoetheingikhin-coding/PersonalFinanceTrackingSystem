@@ -4,6 +4,7 @@
 @using MudBlazor;
 @using Variant = MudBlazor.Variant
 @layout MainLayout
+@inject ILogger<Page_TransactionManagement> _logger
 @if (_formType == EnumFormType.List)
 {
     <MudCard>

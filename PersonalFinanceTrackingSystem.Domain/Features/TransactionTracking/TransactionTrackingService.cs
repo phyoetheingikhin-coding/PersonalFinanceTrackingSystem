@@ -34,9 +34,6 @@ public class TransactionTrackingService
             }
 
             #endregion
-            
-           
-            
             string query = @" SELECT 
      t.TransactionId,
     t.CreatedDate AS TranDate,

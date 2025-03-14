@@ -8,7 +8,7 @@ namespace PersonalFinanceTrackingSystem.App.Components.Pages.BudgetSetup;
 public partial class Page_BudgetSetup
 {
     private BudgetSetupRequestModel _request = new();
-    private BudgetSetupResponseModel _response = new();
+    private Result<BudgetSetupResponseModel> _response = new();
     private UserSessionModel _userSession = new();
     private EnumFormType _formType = EnumFormType.List;
     private IEnumerable<CategoryDataModel> _lstCategory;
@@ -45,12 +45,14 @@ public partial class Page_BudgetSetup
         _request.PageNumber = _pageNumber;
         _request.PageSize = _pageSize;
         _response = await _budgetSetupService.List(_request);
-        if (!_response.Response.IsSuccess)
+        if (!_response.Success)
         {
-            await _injectService.ErrorMessage(_response.Response.Message);
+            await _injectService.ErrorMessage(_response.Message);
             return;
         }
-        count = _response.PageSetting.TotalPageNo;
+
+        _response.Data.ListBudget = _response.Data.ListBudget;
+        count = _response.Data.PageSetting.TotalPageNo;
         _formType = EnumFormType.List;
         StateHasChanged();
     }
@@ -69,13 +71,13 @@ public partial class Page_BudgetSetup
             _response = await _budgetSetupService.Create(_request);
         }
 
-        if (!_response.Response.IsSuccess)
+        if (!_response.Success)
         {
-            await _injectService.ErrorMessage(_response.Response.Message);
+            await _injectService.ErrorMessage(_response.Message);
             return;
         }
 
-        await _injectService.SuccessMessage(_response.Response.Message);
+        await _injectService.SuccessMessage(_response.Message);
         await List(ps);
     }
 
@@ -86,13 +88,13 @@ public partial class Page_BudgetSetup
         _request.CurrentUserId = _userSession.UserId;
         _request.BudgetId = id;
         var data = await _budgetSetupService.Delete(_request);
-        if (!data.Response.IsSuccess)
+        if (!data.Success)
         {
-            await _injectService.ErrorMessage(data.Response.Message);
+            await _injectService.ErrorMessage(data.Message);
             return;
         }
 
-        await _injectService.SuccessMessage(data.Response.Message);
+        await _injectService.SuccessMessage(data.Message);
         await List(ps);
         StateHasChanged();
     }
@@ -101,19 +103,19 @@ public partial class Page_BudgetSetup
     {
         _request.BudgetId = id;
         var data = await _budgetSetupService.Edit(id);
-        if (!data.Response.IsSuccess)
+        if (!data.Success)
         {
-            await _injectService.ErrorMessage(data.Response.Message);
+            await _injectService.ErrorMessage(data.Message);
             return;
         }
 
-        _request.CategoryName = data.BudgetSetup.CategoryName;
-        _request.CategoryCode = data.BudgetSetup.CategoryCode;
-        _request.LimitAmount = (decimal)data.BudgetSetup.LimitAmount!;
-        _request.FromDate = (DateTime)data.BudgetSetup.FromDate!;
-        _request.ToDate = (DateTime)data.BudgetSetup.ToDate!;
-        _request.BudgetName = data.BudgetSetup.BudgetName;
-        _request.FinanceType = data.BudgetSetup.FinanceType;
+        _request.CategoryName = data.Data.BudgetSetup.CategoryName;
+        _request.CategoryCode = data.Data.BudgetSetup.CategoryCode;
+        _request.LimitAmount = (decimal)data.Data.BudgetSetup.LimitAmount!;
+        _request.FromDate = (DateTime)data.Data.BudgetSetup.FromDate!;
+        _request.ToDate = (DateTime)data.Data.BudgetSetup.ToDate!;
+        _request.BudgetName = data.Data.BudgetSetup.BudgetName;
+        _request.FinanceType = data.Data.BudgetSetup.FinanceType;
         _formType = EnumFormType.Edit;
     }
 
@@ -150,7 +152,7 @@ public partial class Page_BudgetSetup
     async Task GetCategoryList()
     {
         var result = await _budgetSetupService.GetCategoryList(_request.FinanceType);
-        _lstCategory = result.ListCategory;
+        _lstCategory = result.Data.ListCategory;
     }
 
     async Task<bool> CheckRequiredFields(BudgetSetupRequestModel _request)
