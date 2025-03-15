@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.IdentityModel.Tokens;
 using PersonalFinanceTrackingSystem.App.Service.Security;
 using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Profile;
 
@@ -11,6 +12,7 @@ public partial class Page_Profile
     private UserSessionModel _userSession = new();
     private string profileImage;
     private string _imageBase64Str = string.Empty;
+    private string _defaultImage = "images/profile/default-user.png"; 
     private bool disabled = true;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -40,8 +42,19 @@ public partial class Page_Profile
                 await _injectService.ErrorMessage(_profile.Message);
                 return;
             }
-            _profile.Data.ImagePath = _profile.Data.ImagePath ?? "images/profile/profile.png";
-            _imageBase64Str = "data:image;base64," + _profile.Data.ImageStr;
+            if (!_profile.Data.ProfileImage.IsNullOrEmpty())
+            {
+                _imageBase64Str = "data:image;base64," + _profile.Data.ImageStr;
+            }
+            else
+            {
+                _imageBase64Str = _defaultImage;
+            }
+            // _profile.Data.ProfileImage = _profile.Data.ProfileImage ?? "images/profile/default-user.png";
+           // _imageBase64Str = "data:image;base64," + _profile.Data.ImageStr;
+            _request.UserName = _profile.Data.UserName;
+            _request.Phone = _profile.Data.PhoneNo;
+            _request.Email = _profile.Data.Email;
         }
         catch (Exception ex)
         {
@@ -52,7 +65,6 @@ public partial class Page_Profile
     {
         _request.ImageUrl = null;
         _request.ImageFile = null;
-        _request.ImageExtension = null;
         disabled = true;
         StateHasChanged();
     }

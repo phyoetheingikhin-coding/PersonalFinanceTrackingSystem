@@ -3,65 +3,52 @@
 @rendermode RenderMode.InteractiveServer
 @inject NavigationManager Navigation
 @inject ProfileService _profileService
-@inject ILogger<Page_Profile> _logger; 
-@using MudBlazor;
+@inject ILogger<Page_Profile> _logger
+@using MudBlazor
 @using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Profile
-@layout EmptyLayout
+@using Variant = MudBlazor.Variant
+@layout MainLayout
 
 @if (_profile.Data != null)
 {
-    <div class="card">
-        <div class="card-body">
-            <div class="row align-items-center">
-                <!-- Left Side: Profile Image with Badge -->
-                <div class="col-md-3 position-relative text-center">
+    <MudCard Class="pa-4" Elevation="8" Style="max-width: 800px; margin: auto;">
+        <MudCardContent>
+            <div class="d-flex flex-column align-center">
+                <!-- Profile Image with Hover Effect -->
+                <div class="position-relative profile-image-container">
                     @if (_request.ImageUrl is not null)
                     {
-                        <MudImage Src=@_request.ImageUrl Width="200" Height="200" Style="border-radius: 50%;"/>
+                    <MudImage Src=@_request.ImageUrl Width="100" Height="100" Style="border-radius: 50%;"/>
                     }
                     else
                     {
-                        <MudImage Src=@_imageBase64Str Width="200" Height="200" Style="border-radius: 50%;"/>
+                    <MudImage Src=@_imageBase64Str Width="100" Height="100" Style="border-radius: 50%;"/>
                     }
                     <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
                         <ActivatorContent>
-                            <MudBadge Icon="@Icons.Material.Filled.CameraAlt" Color="Color.Info" Style="position: absolute; bottom: 15px; right: 68px; z-index: 10;"/>
+                            <MudBadge Icon="@Icons.Material.Filled.CameraAlt" Color="Color.Info" />
+                            @* Style="position: absolute; bottom: 15px; right: 68px; z-index: 10;" *@
                         </ActivatorContent>
                     </MudFileUpload>
                 </div>
 
-                <!-- Right Side: User Details -->
-                <div class="col-md-9">
-                    <div class="row pb-2">
-                        <div class="mb-3 row">
-                            <b class="col-md-2">User Name</b>
-                            <div class="col-md-10">
-                                @_profile.Data.UserName
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row pb-2">
-                        <div class="mb-3 row">
-                            <b class="col-md-2">Phone</b>
-                            <div class="col-md-10">
-                                @_profile.Data.PhoneNo
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row pb-2">
-                        <div class="mb-3 row">
-                            <b class="col-md-2">Email</b>
-                            <div class="col-md-10">
-                                @_profile.Data.Email
-                            </div>
-                        </div>
-                    </div>
-                    <button @onclick=Clear class="btn btn-outline-dark btn-sm mb-0 me-2" disabled="@disabled" type="button">Clear</button>
-                    <button class="btn btn-success btn-sm mb-0" type="button" @onclick=Save>Save</button>
+                <!-- User Details -->
+                <div class="mt-4" style="width: 100%;">
+                    <MudTextField Label="User Name" Variant="Variant.Outlined" FullWidth="true" @bind-Value="_request.UserName" Class="mb-4" />
+                    <MudTextField Label="Phone" Variant="Variant.Outlined" FullWidth="true" @bind-Value="_request.Phone" Class="mb-4" />
+                    <MudTextField Label="Email" Variant="Variant.Outlined" FullWidth="true" @bind-Value="_request.Email"  Class="mb-4" />
                 </div>
 
-
+                <!-- Action Buttons -->
+                <div class="d-flex justify-center mt-4" style="width: 100%;">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="Clear" Disabled="@disabled" Class="me-2">
+                        Clear
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Save">
+                        Update
+                    </MudButton>
+                </div>
             </div>
-        </div>
-    </div>
+        </MudCardContent>
+    </MudCard>
 }

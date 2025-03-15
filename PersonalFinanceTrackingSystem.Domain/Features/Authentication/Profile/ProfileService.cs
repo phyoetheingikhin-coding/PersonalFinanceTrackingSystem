@@ -8,12 +8,10 @@ namespace PersonalFinanceTrackingSystem.Domain.Features.Authentication.Profile;
 public class ProfileService
 {
     private readonly AppDbContext _db;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ProfileService(AppDbContext db, IHttpContextAccessor httpContextAccessor)
+    public ProfileService(AppDbContext db)
     {
         _db = db;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<Result<ProfileModel>> GetProfileAsync(ProfileRequestModel request)
@@ -92,7 +90,6 @@ public class ProfileService
             Directory.CreateDirectory(folderPath);
         }
 
-        // var fileName = $"{Guid.NewGuid()}{request.ImageExtension}";
         var fileName = Guid.NewGuid() + ".png";
         var filePath = Path.Combine(folderPath, fileName);
 
@@ -104,6 +101,9 @@ public class ProfileService
         #region Save Image Path
 
         user.ProfileImage = filePath;
+        user.UserName = request.UserName;
+        user.Phone = request.Phone;
+        user.Email = request.Email;
         _db.Entry(user).State = EntityState.Modified;
         await _db.SaveChangesAsync();
 
