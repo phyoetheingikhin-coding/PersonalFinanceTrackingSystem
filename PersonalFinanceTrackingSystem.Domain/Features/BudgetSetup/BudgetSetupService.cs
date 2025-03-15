@@ -29,12 +29,8 @@ public class BudgetSetupService
                 .FirstOrDefaultAsync(x => x.UserId == requestModel.CurrentUserId);
             if (user is not null)
             {
-                // var query = _db.Tbl_Budgets.AsNoTracking()
-                //     .Where(x => x.UserId == requestModel.CurrentUserId);
-                //
-                // var budgetList = await query
-                //     .Skip((requestModel.PageNumber - 1) * requestModel.PageSize)
-                //     .Take(requestModel.PageSize)
+                // var budgetList = await _db.Tbl_Budgets.AsNoTracking()
+                //     .Where(x => x.UserId == requestModel.CurrentUserId)
                 //     .Select(x => new BudgetSetupDataModel
                 //     {
                 //         BudgetId = x.BudgetId,
@@ -44,59 +40,44 @@ public class BudgetSetupService
                 //         FromDate = x.FromDate,
                 //         ToDate = x.ToDate,
                 //         LimitAmount = x.LimitAmount,
-                //     })
-                //     .ToListAsync();
+                //     }).ToListAsync();
+                // pageSetting.TotalRowCount = budgetList.Count;
+                // model.PageSetting = pageSetting;
+                // model.ListBudget = budgetList
+                //     .Skip(requestModel.PageSetting.SkipRowCount)
+                //     .Take(requestModel.PageSetting.PageSize).ToList();
                 // model.ListBudget = budgetList;
-                // model.TotalRecords = await query.CountAsync();
-                // model.Response = SubResponseModel.GetResponseMsg("", true);
 
-                var budgetList = await _db.Tbl_Budgets.AsNoTracking()
-                    .Where(x => x.UserId == requestModel.CurrentUserId)
-                    .Select(x => new BudgetSetupDataModel
-                    {
-                        BudgetId = x.BudgetId,
-                        BudgetName = x.BudgetName,
-                        CategoryName = x.CategoryName,
-                        UserName = user.UserName,
-                        FromDate = x.FromDate,
-                        ToDate = x.ToDate,
-                        LimitAmount = x.LimitAmount,
-                    }).ToListAsync();
-                pageSetting.TotalRowCount = budgetList.Count;
+                var query = @"SELECT  
+    b.BudgetName,
+    b.LimitAmount, 
+    b.FromDate,
+    b.ToDate,
+    t.TransactionType AS FinanceType,
+    SUM(CASE 
+        WHEN t.TransactionType = 'Expense' THEN t.Amount  
+        WHEN t.TransactionType = 'Income' THEN t.Amount  
+        ELSE 0 
+    END) AS NewUsedAmount
+FROM 
+    Tbl_Transactions t 
+INNER JOIN 
+    Tbl_Budgets b ON b.CategoriesCode = t.CategoriesCode
+INNER JOIN 
+    Tbl_Categories cat ON cat.CategoriesCode = t.CategoriesCode
+WHERE 
+    b.UserId = @CurrentUserId 
+    AND t.UserId = @CurrentUserId
+    AND CONVERT(DATE, t.CreatedDate) BETWEEN CONVERT(DATE, b.FromDate) AND CONVERT(DATE, b.ToDate)
+GROUP BY 
+    b.BudgetName, b.LimitAmount, b.FromDate, b.ToDate,t.TransactionType";
+                var result = _dapper.Query<BudgetSetupDataModel>(query, requestModel);
+                pageSetting.TotalRowCount = result.Count;
                 model.PageSetting = pageSetting;
-                model.ListBudget = budgetList
+                model.ListBudget = result
                     .Skip(requestModel.PageSetting.SkipRowCount)
                     .Take(requestModel.PageSetting.PageSize).ToList();
-                model.ListBudget = budgetList;
 
-//                 var query = @"SELECT  
-//     b.BudgetName,
-//     b.LimitAmount, 
-//     b.FromDate,
-//     b.ToDate,
-//     SUM(CASE 
-//         WHEN t.TransactionType = 'Expense' THEN t.Amount  
-//         WHEN t.TransactionType = 'Income' THEN -t.Amount  
-//         ELSE 0 
-//     END) AS NewUsedAmount
-// FROM 
-//     Tbl_Transactions t 
-// INNER JOIN 
-//     Tbl_Budgets b ON b.CategoriesCode = t.CategoriesCode
-// INNER JOIN 
-//     Tbl_Categories cat ON cat.CategoriesCode = t.CategoriesCode
-// WHERE 
-//     b.UserId = @CurrentUserId 
-//     AND t.UserId = @CurrentUserId
-//     AND CONVERT(DATE, t.CreatedDate) BETWEEN CONVERT(DATE, b.FromDate) AND CONVERT(DATE, b.ToDate)
-// GROUP BY 
-//     b.BudgetName, b.LimitAmount, b.FromDate, b.ToDate";
-//                 var result = _dapper.Query<BudgetSetupDataModel>(query, requestModel);
-//                 pageSetting.TotalRowCount = result.Count;
-//                 model.PageSetting = pageSetting;
-//                 model.ListBudget = result
-//                     .Skip(requestModel.PageSetting.SkipRowCount)
-//                     .Take(requestModel.PageSetting.PageSize).ToList();
             }
         }
         catch (Exception ex)

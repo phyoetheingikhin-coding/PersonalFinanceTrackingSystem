@@ -8,56 +8,127 @@
 @using MudBlazor;
 @using Variant = MudBlazor.Variant
 
-@* @if (_formType == EnumFormType.List) *@
-@* { *@
-@*     <MudCard> *@
-@*         <MudCardHeader> *@
-@*             <MudTypography Typo="Typo.h5"> *@
-@*                 <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="Create">Create</MudButton> *@
-@*                 Budget *@
-@*             </MudTypography> *@
-@*         </MudCardHeader> *@
-@* *@
-@*         @if (_response.Data.ListBudget != null && _response.Data.ListBudget.Count() > 0) *@
-@*         { *@
-@*             int no = (ps.PageNo - 1) * ps.PageSize; *@
-@*             foreach (var budget in _response.Data.ListBudget) *@
-@*             { *@
-@*                 <MudItem xs="12" sm="6"> *@
-@*                     <!-- 2 cards per row on small and larger screens --> *@
-@*                     <div class="card mb-3"> *@
-@*                         <div class="card-body"> *@
-@*                             <h2 class="card-title">@budget.BudgetName</h2> *@
-@*                             <p class="card-text"> *@
-@*                                 <strong>Date Range:</strong> @budget.FromDate - @budget.ToDate *@
-@*                             </p> *@
-@*                             <MudProgressLinear Color="Color.Info" Size="Size.Large" Value="25" Class="my-7"> *@
-@*                                 <MudText Typo="Typo.subtitle1" Color="Color.Dark"> *@
-@*                                     <b>25%</b> *@
-@*                                 </MudText> *@
-@*                             </MudProgressLinear> *@
-@*                             <div class="status"> *@
-@*                                 <p class="card-text"> *@
-@*                                     <strong>Budget:</strong> Ks@(budget.NewUsedAmount) / Ks@(budget.LimitAmount) *@
-@*                                 </p> *@
-@*                                 <p class="card-text"> *@
-@*                                     <strong>Remaining:</strong> Ks@(budget.LimitAmount - budget.NewUsedAmount) Left *@
-@*                                 </p> *@
-@*                             </div> *@
-@*                         </div> *@
-@*                     </div> *@
-@*                 </MudItem> *@
-@*             } *@
-@*             <div class="d-flex flex-column align-center mb-4"> *@
-@*                 <MudPagination BoundaryCount="2" MiddleCount="5" SelectedChanged="PageChanged" Count="@count" Class="mt-4" /> *@
-@*             </div> *@
-@*         } *@
-@*         else *@
-@*         { *@
-@*             <MudTypography Class="ml-6" Typo="Typo.body1">No Record To Show</MudTypography> *@
-@*         } *@
-@*     </MudCard> *@
-@* } *@
+@if (_formType == EnumFormType.List)
+{
+    <MudCard>
+        <MudCardHeader>
+            <MudTypography Typo="Typo.h5">
+                <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="Create">Create</MudButton>
+                Budget
+            </MudTypography>
+        </MudCardHeader>
+
+        <MudGrid>
+            @if (_budgetList != null && _budgetList.Count() > 0)
+            {
+                int no = (ps.PageNo - 1) * ps.PageSize;
+                foreach (var budget in _budgetList)
+                {
+                    <MudItem xs="12" sm="6">
+                        <!-- 2 cards per row on small and larger screens -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h2 class="card-title">@budget.BudgetName</h2>
+                                <p class="card-text">
+                                    <strong>Date Range:</strong> @budget.FromDate - @budget.ToDate
+                                </p>
+
+                                @* <MudProgressLinear Color="Color.Info" Size="Size.Large" *@
+                                @*                    Value="@(budget.NewUsedAmount.HasValue && budget.LimitAmount.HasValue && budget.LimitAmount.Value > 0 *@
+                                @*                               ? (double) ((budget.NewUsedAmount.Value * 100) / budget.LimitAmount.Value) *@
+                                @*                               : 0)" *@
+                                @*                    Class="my-7"> *@
+                                @* *@
+                                @*     <MudText Typo="Typo.subtitle1" Color="Color.Dark"> *@
+                                @*         <b>@(budget.NewUsedAmount.HasValue && budget.LimitAmount.HasValue && budget.LimitAmount.Value > 0 *@
+                                @*                ? ((budget.NewUsedAmount.Value * 100) / budget.LimitAmount.Value).ToString("0.00") *@
+                                @*                : "0.00")%</b> *@
+                                @*     </MudText> *@
+                                @* *@
+                                @* </MudProgressLinear> *@
+
+                                @if (budget.FinanceType != "Income")
+                                {
+                                    <MudProgressLinear
+                                        Color="@(budget.NewUsedAmount.HasValue && budget.LimitAmount.HasValue && budget.LimitAmount.Value > 0 && budget.NewUsedAmount.Value > budget.LimitAmount.Value ? Color.Error : Color.Info)"
+                                        Size="Size.Large"
+                                        Value="@(budget.NewUsedAmount.HasValue && budget.LimitAmount.HasValue && budget.LimitAmount.Value > 0 ? (double)((budget.NewUsedAmount.Value * 100) / budget.LimitAmount.Value) : 0)"
+                                        Class="my-7">
+
+                                        <MudText Typo="Typo.subtitle1" Color="Color.Dark">
+                                            <b>
+                                                @(budget.NewUsedAmount.HasValue && budget.LimitAmount.HasValue && budget.LimitAmount.Value > 0
+                                                    ? ((budget.NewUsedAmount.Value * 100) / budget.LimitAmount.Value).ToString("0.00")
+                                                    : "0.00")%
+                                            </b>
+                                        </MudText>
+
+                                    </MudProgressLinear>
+                                    <div class="status">
+                                        <p class="card-text">
+                                            <strong>Budget:</strong> Ks@(budget.NewUsedAmount) / Ks@(budget.LimitAmount)
+                                        </p>
+                                        <p class="card-text">
+                                            <strong>Remaining:</strong> Ks@(budget.LimitAmount - budget.NewUsedAmount) Left
+                                        </p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <MudProgressLinear
+                                        Color="@(budget.NewUsedAmount.HasValue && budget.LimitAmount.HasValue && budget.LimitAmount.Value > 0 && budget.NewUsedAmount.Value > budget.LimitAmount.Value ? Color.Success : Color.Info)"
+                                        Size="Size.Large"
+                                        Value="@(budget.NewUsedAmount.HasValue && budget.LimitAmount.HasValue && budget.LimitAmount.Value > 0 ? (double)((budget.NewUsedAmount.Value * 100) / budget.LimitAmount.Value) : 0)"
+                                        Class="my-7">
+
+                                        <MudText Typo="Typo.subtitle1" Color="Color.Dark">
+                                            <b>
+                                                @(budget.NewUsedAmount.HasValue && budget.LimitAmount.HasValue && budget.LimitAmount.Value > 0
+                                                    ? ((budget.NewUsedAmount.Value * 100) / budget.LimitAmount.Value).ToString("0.00")
+                                                    : "0.00")%
+                                            </b>
+                                        </MudText>
+
+                                    </MudProgressLinear>
+                                    <div class="status">
+                                        <p class="card-text">
+                                            <strong>Budget:</strong> Ks@(budget.NewUsedAmount) / Ks@(budget.LimitAmount)
+                                        </p>
+                                        @if (budget.LimitAmount >= budget.NewUsedAmount)
+                                        {
+                                            <p class="card-text">
+                                                <strong>Budget:</strong>
+                                                Ks{ @(budget.LimitAmount - budget.NewUsedAmount)
+                                                }
+                                                Left
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p class="card-text">
+                                                <strong>Budget:</strong>
+                                                Ks @(budget.NewUsedAmount - budget.LimitAmount) Exceed
+                                            </p>
+                                        }
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+                    </MudItem>
+                }
+
+                <div class="d-flex flex-column align-center mb-4">
+                    <MudPagination BoundaryCount="2" MiddleCount="5" SelectedChanged="PageChanged" Count="@count" Class="mt-4"/>
+                </div>
+            }
+            else
+            {
+                <MudTypography Class="ml-6" Typo="Typo.body1">No Record To Show</MudTypography>
+            }
+        </MudGrid >
+    </MudCard>
+}
 
 @if (_formType == EnumFormType.Create || _formType == EnumFormType.Edit)
 {
@@ -135,53 +206,53 @@
     </div>
 }
 
-@if (_formType == EnumFormType.List)
-{
-<MudCard>
-    <MudCardHeader>
-        <MudTypography Typo="Typo.h5">
-            <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="Create">Create</MudButton>
-            Budget
-        </MudTypography>
-    </MudCardHeader>
-
-    @* @_response.Data.ListBudget != null && _response.Data.ListBudget.Count() > 0 *@
-    @* @if (_response.Data.ListBudget != null && _response.Data.ListBudget.Count() > 0) *@
-    @* { *@
-    <div style="width: 100%; overflow: auto; max-height: 400px;">
-        <MudTable Items="_response.Data.ListBudget" Hover="true" Dense="true" Class="mt-3" Style="min-width: 100%;" RowsPerPage="10">
-            <HeaderContent>
-                <MudTh>Sr No.</MudTh>
-                <MudTh>Budget Name</MudTh>
-                <MudTh>Category Name</MudTh>
-                <MudTh>Limit Amount</MudTh>
-                <MudTh>From Date</MudTh>
-                <MudTh>To Date</MudTh>
-                <MudTh>Action</MudTh>
-            </HeaderContent>
-            <RowTemplate Context="item">
-                <MudTd>@(_response.Data.ListBudget.IndexOf(item) + 1)</MudTd>
-                <MudTd>@item.BudgetName</MudTd>
-                <MudTd>@item.CategoryName</MudTd>
-                <MudTd>@item.LimitAmount</MudTd>
-                <MudTd>@item.FromDate</MudTd>
-                <MudTd>@item.ToDate</MudTd>
-                <MudTd>
-                    <div style="display: flex; gap: 8px;">
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => Edit(item.BudgetId)">Edit</MudButton>
-                        <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="() => Delete(item.BudgetId)">Delete</MudButton>
-                    </div>
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
-        <div class="d-flex flex-column align-center mb-4">
-            <MudPagination BoundaryCount="2" MiddleCount="5" SelectedChanged="PageChanged" Count="@count" Class="mt-4"/>
-        </div>
-    </div>
-    @* } *@
-    @* else *@
-    @* { *@
-    <MudTypography Class="ml-6" Typo="Typo.body1">No Record To Show</MudTypography>
-    @* } *@
-</MudCard>
-}
+@* @if (_formType == EnumFormType.List) *@
+@* { *@
+@* <MudCard> *@
+@*     <MudCardHeader> *@
+@*         <MudTypography Typo="Typo.h5"> *@
+@*             <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Small" OnClick="Create">Create</MudButton> *@
+@*             Budget *@
+@*         </MudTypography> *@
+@*     </MudCardHeader> *@
+@* *@
+@*     $1$ @_response.Data.ListBudget != null && _response.Data.ListBudget.Count() > 0 #1# *@
+@*     @if (_budgetList != null && _budgetList.Count() > 0) *@
+@*     { *@
+@*     <div style="width: 100%; overflow: auto; max-height: 400px;"> *@
+@*         <MudTable Items="_budgetList" Hover="true" Dense="true" Class="mt-3" Style="min-width: 100%;" RowsPerPage="10"> *@
+@*             <HeaderContent> *@
+@*                 <MudTh>Sr No.</MudTh> *@
+@*                 <MudTh>Budget Name</MudTh> *@
+@*                 <MudTh>Category Name</MudTh> *@
+@*                 <MudTh>Limit Amount</MudTh> *@
+@*                 <MudTh>From Date</MudTh> *@
+@*                 <MudTh>To Date</MudTh> *@
+@*                 <MudTh>Action</MudTh> *@
+@*             </HeaderContent> *@
+@*             <RowTemplate Context="item"> *@
+@*                 <MudTd>@(_budgetList.IndexOf(item) + 1)</MudTd> *@
+@*                 <MudTd>@item.BudgetName</MudTd> *@
+@*                 <MudTd>@item.CategoryName</MudTd> *@
+@*                 <MudTd>@item.LimitAmount</MudTd> *@
+@*                 <MudTd>@item.FromDate</MudTd> *@
+@*                 <MudTd>@item.ToDate</MudTd> *@
+@*                 <MudTd> *@
+@*                     <div style="display: flex; gap: 8px;"> *@
+@*                         <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" OnClick="() => Edit(item.BudgetId)">Edit</MudButton> *@
+@*                         <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" OnClick="() => Delete(item.BudgetId)">Delete</MudButton> *@
+@*                     </div> *@
+@*                 </MudTd> *@
+@*             </RowTemplate> *@
+@*         </MudTable> *@
+@*         <div class="d-flex flex-column align-center mb-4"> *@
+@*             <MudPagination BoundaryCount="2" MiddleCount="5" SelectedChanged="PageChanged" Count="@count" Class="mt-4"/> *@
+@*         </div> *@
+@*     </div> *@
+@*     } *@
+@*     else *@
+@*     { *@
+@*     <MudTypography Class="ml-6" Typo="Typo.body1">No Record To Show</MudTypography> *@
+@*     } *@
+@* </MudCard> *@
+@* } *@

@@ -13,6 +13,7 @@ public partial class Page_BudgetSetup
     private EnumFormType _formType = EnumFormType.List;
     private IEnumerable<CategoryDataModel> _lstCategory;
     private PageSettingModel ps = new();
+    private List<BudgetSetupDataModel> _budgetList;
     bool visible = false;
     private int count;
     private int value = 0;
@@ -51,7 +52,7 @@ public partial class Page_BudgetSetup
             return;
         }
 
-        _response.Data.ListBudget = _response.Data.ListBudget;
+        _budgetList = _response.Data.ListBudget;
         count = _response.Data.PageSetting.TotalPageNo;
         _formType = EnumFormType.List;
         StateHasChanged();

@@ -96,10 +96,20 @@ public partial class Page_TransactionManagement
             }
 
             _request.CategoryName = data.TransactionData.CategoryName;
+            _request.CategoryCode = data.TransactionData.CategoryCode;
             _request.Amount = (decimal)data.TransactionData.Amount!;
             _request.FinanceType = data.TransactionData.FinanceType;
             _request.Description = data.TransactionData.Descriptions;
             _request.TranDate = (DateTime)data.TransactionData.TranDate!;
+            _lstCategory = new List<CategoryDataModel>
+            {
+                new CategoryDataModel
+                {
+                    CategoryName = data.TransactionData.CategoryName,
+                    CategoryCode = data.TransactionData.CategoryCode
+                }
+            };
+            value = _request.FinanceType == "Expense" ? 0 : 1;
             _formType = EnumFormType.Edit;
         }
         catch (Exception ex)

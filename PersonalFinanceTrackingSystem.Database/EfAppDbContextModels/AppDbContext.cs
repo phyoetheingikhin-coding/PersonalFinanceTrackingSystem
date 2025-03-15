@@ -24,7 +24,6 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Tbl_Transaction> Tbl_Transactions { get; set; }
 
     public virtual DbSet<Tbl_User> Tbl_Users { get; set; }
-
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -112,6 +111,9 @@ public partial class AppDbContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Phone)
                 .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.ProfileImage)
+                .HasMaxLength(500)
                 .IsUnicode(false);
             entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
             entity.Property(e => e.UserId)

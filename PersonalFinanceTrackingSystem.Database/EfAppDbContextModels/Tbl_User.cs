@@ -22,4 +22,6 @@ public partial class Tbl_User
     public DateTime? CreatedDate { get; set; }
 
     public DateTime? UpdatedDate { get; set; }
+
+    public string? ProfileImage { get; set; }
 }

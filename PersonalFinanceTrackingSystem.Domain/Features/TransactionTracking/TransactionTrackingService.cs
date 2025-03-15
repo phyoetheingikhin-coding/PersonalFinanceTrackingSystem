@@ -142,6 +142,7 @@ WHERE
             dataModel.TranDate = item.CreatedDate;
             dataModel.FinanceType = item.TransactionType;
             dataModel.TransactionId = item.TransactionId;
+            dataModel.CategoryCode = item.CategoriesCode;
 
             model.TransactionData = dataModel;
             model.Response = SubResponseModel.GetResponseMsg("", true);

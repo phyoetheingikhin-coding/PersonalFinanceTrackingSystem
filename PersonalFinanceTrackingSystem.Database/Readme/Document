@@ -1,0 +1,1 @@
+dotnet ef dbcontext scaffold "Data Source=.;Initial Catalog=PersonalFinanceTracking;User Id=sa;Password=sasa@123;TrustServerCertificate=true;" Microsoft.EntityFrameworkCore.SqlServer -o EfAppDbContextModels -c AppDbContext --use-database-names --force

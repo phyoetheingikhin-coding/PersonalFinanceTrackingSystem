@@ -7,6 +7,7 @@ public class TransactionDataModel
     public decimal? Amount { get; set; }
 
     public string CategoryName { get; set; } = null!;
+    public string CategoryCode { get; set; } = null!;
 
     public DateTime? TranDate { get; set; }
     public string FinanceType { get; set; }

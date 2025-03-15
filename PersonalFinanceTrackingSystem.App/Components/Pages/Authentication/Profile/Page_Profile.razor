@@ -1,10 +1,67 @@
 ﻿@page "/profile"
 @using PersonalFinanceTrackingSystem.App.Components.Layout
-@layout MainLayout
+@rendermode RenderMode.InteractiveServer
+@inject NavigationManager Navigation
+@inject ProfileService _profileService
+@inject ILogger<Page_Profile> _logger; 
+@using MudBlazor;
+@using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Profile
+@layout EmptyLayout
 
-<PageTitle>Profile</PageTitle>
+@if (_profile.Data != null)
+{
+    <div class="card">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <!-- Left Side: Profile Image with Badge -->
+                <div class="col-md-3 position-relative text-center">
+                    @if (_request.ImageUrl is not null)
+                    {
+                        <MudImage Src=@_request.ImageUrl Width="200" Height="200" Style="border-radius: 50%;"/>
+                    }
+                    else
+                    {
+                        <MudImage Src=@_imageBase64Str Width="200" Height="200" Style="border-radius: 50%;"/>
+                    }
+                    <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                        <ActivatorContent>
+                            <MudBadge Icon="@Icons.Material.Filled.CameraAlt" Color="Color.Info" Style="position: absolute; bottom: 15px; right: 68px; z-index: 10;"/>
+                        </ActivatorContent>
+                    </MudFileUpload>
+                </div>
+
+                <!-- Right Side: User Details -->
+                <div class="col-md-9">
+                    <div class="row pb-2">
+                        <div class="mb-3 row">
+                            <b class="col-md-2">User Name</b>
+                            <div class="col-md-10">
+                                @_profile.Data.UserName
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pb-2">
+                        <div class="mb-3 row">
+                            <b class="col-md-2">Phone</b>
+                            <div class="col-md-10">
+                                @_profile.Data.PhoneNo
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pb-2">
+                        <div class="mb-3 row">
+                            <b class="col-md-2">Email</b>
+                            <div class="col-md-10">
+                                @_profile.Data.Email
+                            </div>
+                        </div>
+                    </div>
+                    <button @onclick=Clear class="btn btn-outline-dark btn-sm mb-0 me-2" disabled="@disabled" type="button">Clear</button>
+                    <button class="btn btn-success btn-sm mb-0" type="button" @onclick=Save>Save</button>
+                </div>
 
 
-@code {
-
+            </div>
+        </div>
+    </div>
 }

@@ -8,6 +8,7 @@ using PersonalFinanceTrackingSystem.App.Service;
 using PersonalFinanceTrackingSystem.Domain.Features.BudgetSetup;
 using PersonalFinanceTrackingSystem.App.Service.Security;
 using MudBlazor.Services;
+using PersonalFinanceTrackingSystem.Domain.Features.Authentication.Profile;
 using PersonalFinanceTrackingSystem.Shared.DapperService;
 using Serilog;
 
@@ -40,6 +41,8 @@ builder.Services.AddScoped<DapperService>(x => new DapperService(connectionStrin
 
 #endregion
 
+// Register IHttpContextAccessor
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IInjectService, InjectService>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
@@ -48,6 +51,7 @@ builder.Services.AddScoped<LoginService>();
 builder.Services.AddScoped<RegisterService>();
 builder.Services.AddScoped<BudgetSetupService>();
 builder.Services.AddScoped<TransactionTrackingService>();
+builder.Services.AddScoped<ProfileService>();
 
 
 var app = builder.Build();
